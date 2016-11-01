@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>806</width>
-    <height>548</height>
+    <width>860</width>
+    <height>631</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,10 +25,31 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>782</width>
-         <height>459</height>
+         <width>836</width>
+         <height>544</height>
         </rect>
        </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="tabWidget">
+          <widget class="QWidget" name="tabWidgetPage1" native="true">
+           <attribute name="title">
+            <string/>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab">
+           <attribute name="title">
+            <string>页</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_2">
+           <attribute name="title">
+            <string>页</string>
+           </attribute>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -39,7 +60,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>806</width>
+     <width>860</width>
      <height>26</height>
     </rect>
    </property>
@@ -67,15 +88,18 @@
    <addaction name="menu1_2"/>
    <addaction name="menu"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <action name="action1">
    <property name="text">
     <string>新建项目(&amp;N)</string>

@@ -2,16 +2,17 @@
 #include "ui_mainwindow.h"
 #include <QtWidgets>
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     imageLabel(new QLabel)
 {
     ui->setupUi(this);
-    ui->scrollArea->setBackgroundRole(QPalette::Base);
-    ui->scrollArea->setWidget(imageLabel);
-    ui->scrollArea->setVisible(false);
-
+  //  ui->scrollArea->setBackgroundRole(QPalette::Base);
+  //  ui->scrollArea->setWidget(imageLabel);
+  //  ui->scrollArea->setVisible(true);
+    //ui->scrollArea->
 
 
 }
