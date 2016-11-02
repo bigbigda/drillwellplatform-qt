@@ -12,8 +12,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    createprodialog.cpp \
+    projectdom.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    createprodialog.h \
+    projectdom.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    createprodialog.ui

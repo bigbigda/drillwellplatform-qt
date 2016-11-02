@@ -8,11 +8,27 @@
 #include <QXmlStreamReader>
 #include <QtWidgets>
 #include <stdio.h>
+#include <QString>
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+    QString path("C:\Users\nice\Desktop");
+     QDir dir;
+     dir.mkdir("C:\Users\nice\Desktop\123");
+
+     //dir.mkpath("joh");
+   /* if(QDir::mkpath("C:\Users\nice\Desktop\new_my"))
+    {
+        qInfo("mkdir sucsess");
+    }else
+    {
+        qInfo("failed!");
+    }
+*/
+      MainWindow w;
+     w.show();
+
     return a.exec();
     QDomDocument doc;
         QDomDocument doc2;

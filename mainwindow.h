@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QImage>
+
 namespace Ui {
 class MainWindow;
 }
@@ -11,6 +12,8 @@ class QLabel;
 class QMenu;
 class QScrollArea;
 class QScrollBar;
+class CreateProDialog;
+class ProjectDom;
 
 class MainWindow : public QMainWindow
 {
@@ -35,7 +38,8 @@ private:
     QImage image;
     QLabel *imageLabel;
     double scaleFactor;
-
+    CreateProDialog *createprodialogPoint;
+    ProjectDom * projectdompoint;
 };
 
 #endif // MAINWINDOW_H
