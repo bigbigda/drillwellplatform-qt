@@ -13,12 +13,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    createprodialog.cpp \
-    projectdom.cpp
+    projectdom.cpp \
+    createprowizard.cpp \
+    calcwizard.cpp
 
 HEADERS  += mainwindow.h \
-    createprodialog.h \
-    projectdom.h
+    projectdom.h \
+    createprowizard.h \
+    calcwizard.h
 
-FORMS    += mainwindow.ui \
-    createprodialog.ui
+FORMS    += mainwindow.ui
+
+RESOURCES += \
+    image.qrc

@@ -1,8 +1,10 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QtWidgets>
-#include <createprodialog.h>
+#include <createprowizard.h>
 #include <projectdom.h>
+#include <QCloseEvent>
+#include <calcwizard.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -10,15 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
     imageLabel(new QLabel)
 {
     ui->setupUi(this);
-    createprodialogPoint = new CreateProDialog(QDir::currentPath());
-    projectdompoint = new ProjectDom(QDomDocument(),this);
-
+    projectdompoint = 0;
+    createprodialogPoint = 0;
     //  formPoint->show();
     //  ui->scrollArea->setBackgroundRole(QPalette::Base);
     //  ui->scrollArea->setWidget(imageLabel);
     //  ui->scrollArea->setVisible(true);
     //  ui->scrollArea->
-
 
 }
 
@@ -81,7 +81,7 @@ void MainWindow::setImage(const QImage &newImage)
     scaleFactor = 1.0;
 
     ui->scrollArea->setVisible(true);
-    ui->actionA->setEnabled(true);
+    ui->action_Save->setEnabled(true);
     //fitToWindowAct->setEnabled(true);
     //updateActions();
 
@@ -89,50 +89,112 @@ void MainWindow::setImage(const QImage &newImage)
      //   imageLabel->adjustSize();
 }
 
-void MainWindow::on_action1_triggered()
+
+
+void MainWindow::closeEvent (QCloseEvent *event)
 {
-  //QFileDialog dialog(this, tr("Open File!!!!!"));
-  //initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
-  //while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
-
-    if(createprodialogPoint->exec() == QDialog::Accepted)
+    projectdompoint = 0;
+    if(projectdompoint == 0)
     {
-        qInfo() << "confirmed";
-        //qInfo() << createprodialogPoint->ui->linEdit->text();
-        qInfo() << createprodialogPoint->BackProjectName();
-        qInfo() << createprodialogPoint->BackProjectDir();
-        QDomProcessingInstruction instruction = projectdompoint->domDocument.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
-        projectdompoint->domDocument.appendChild(instruction);
-
-        QDomElement root = projectdompoint->domDocument.createElement("DP-Project");
-        projectdompoint->domDocument.appendChild(root);
-
-        QDomElement basicInfo = projectdompoint->domDocument.createElement("BasicInfo");
-        QDomText sNodeText = projectdompoint->domDocument.createTextNode("good");
-        basicInfo.appendChild(sNodeText);
-        root.appendChild(basicInfo);
-
-        QFile file("text.xml");
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
-        {}
-        QTextStream out(&file);
-        out.setCodec("UTF-8");
-        projectdompoint->domDocument.save(out, 4, QDomNode::EncodingFromTextStream);
-        file.close();
-
-
+        event->accept();
+    } else  if(projectdompoint->ProjectNotSaved()){
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, projectdompoint->projectName,
+                                                                QString::fromLocal8Bit("Are you sure?\n"),
+                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
+    } else {
+        event->accept();
+    }
     }
 
 }
 
-
-
-void MainWindow::on_actionA_triggered()
+void MainWindow::on_action_About_triggered()
 {
-
+      QMessageBox::aboutQt(this);
 }
 
-void MainWindow::on_actionA_2_triggered()
+void MainWindow::on_action_Exit_triggered()
 {
-    QMessageBox::aboutQt(this);
+      this->close();
+}
+
+
+void MainWindow::on_action_Save_triggered()
+{
+    //保存
+    this->projectdompoint->ProjectSaved();
+}
+
+
+
+void MainWindow::on_action_New_triggered()
+{
+    if(projectdompoint != 0)
+    {
+        delete projectdompoint;
+    }
+
+    projectdompoint = new ProjectDom(QDomDocument(),this);
+    createprodialogPoint = new CreateProWizard(this->projectdompoint,this);
+
+    if(createprodialogPoint->exec() == QDialog::Accepted)
+    {
+        qInfo() << "confirmed";
+
+        this->projectdompoint->InitWriteXml();
+    }
+        delete createprodialogPoint;
+}
+
+void MainWindow::on_action_Open_triggered()
+{
+
+
+    if(projectdompoint != 0)
+    {
+        delete projectdompoint;
+    }
+
+    projectdompoint = new ProjectDom(QDomDocument(),this);
+
+    QString file = QFileDialog::getOpenFileName(
+                this,QString::fromLocal8Bit("打开项目"), "", "dp-project (*.dpro )"
+                        );
+    if (file != NULL)
+    {
+        QByteArray bytarr = file.toLatin1();
+        qInfo(bytarr.data());
+        //读取xml, 重建DOM
+        QFile xmlFile(file);
+        if (!xmlFile.exists() || !xmlFile.open(QFile::ReadOnly | QFile::Text)) {
+            QMessageBox msgBox;
+            msgBox.setText(QString::fromLocal8Bit("项目文件受损"));
+            msgBox.exec();
+         }
+        projectdompoint->domDocument.setContent(&xmlFile);
+        QDomElement DPProjectElement = projectdompoint->domDocument.firstChildElement();
+        QDomElement BasicInfoElement = DPProjectElement.firstChildElement("BasicInfo");
+        QDomElement ProjectNameElement = BasicInfoElement.firstChildElement("ProjectName");
+        QString name = ProjectNameElement.text();
+        projectdompoint->projectName = ProjectNameElement.text();
+        projectdompoint->projectDir  = QFileInfo(xmlFile).absolutePath();
+
+    }
+}
+
+
+
+void MainWindow::on_action_Cal_triggered()
+{
+    CalcWizard * calcwizard = new CalcWizard(this->projectdompoint);
+    calcwizard->exec();
+}
+
+
+void MainWindow::on_pushButton2_clicked()
+{
+
 }

@@ -1,4 +1,4 @@
-#ifndef PROJECTDOM_H
+﻿#ifndef PROJECTDOM_H
 #define PROJECTDOM_H
 
 #include <QDomDocument>
@@ -10,8 +10,14 @@ class ProjectDom
 public:
     ProjectDom(QDomDocument document, QObject *parent = 0);
     QDomDocument domDocument;
+    QString projectName;
+    QString projectDir;
+    void    InitWriteXml();
+    void    ProjectChanged();
+    void    ProjectSaved();
+    bool    ProjectNotSaved();
 private:
-
+    bool    flagNeedToSave;
 };
 
 #endif // PROJECTDOM_H
