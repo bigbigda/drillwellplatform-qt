@@ -11,8 +11,6 @@ class MainWindow;
 class QAction;
 class QLabel;
 class QMenu;
-class QScrollArea;
-class QScrollBar;
 class CreateProWizard;
 class ProjectDom;
 
@@ -25,8 +23,6 @@ public:
     ~MainWindow();
     void MainWindow::closeEvent (QCloseEvent *event);
 private:
-     bool loadFile(const QString &);
-     void setImage(const QImage &newImage);
 
 private slots:
 
@@ -35,21 +31,18 @@ private slots:
 
     void on_action_Exit_triggered();
 
-    void on_action_Save_triggered();
-
     void on_action_New_triggered();
 
     void on_action_Open_triggered();
 
     void on_action_Cal_triggered();
 
-    void on_pushButton2_clicked();
+    void on_action_LaF_triggered();
+
+    void on_action_set_triggered();
 
 private:
     Ui::MainWindow *ui;
-    QImage image;
-    QLabel *imageLabel;
-    double scaleFactor;
     CreateProWizard *createprodialogPoint;
     ProjectDom * projectdompoint;
 };

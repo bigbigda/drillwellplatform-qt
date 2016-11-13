@@ -6,7 +6,7 @@
 #include <QtWidgets>
 
 CreateProWizard::CreateProWizard(ProjectDom *tmpdompoint, QWidget *parent)
-
+  : QWizard(parent)
 {
     projectdompoint = tmpdompoint;
 
@@ -44,24 +44,65 @@ void CreateProWizard::CreateQDom()
     QDomElement BasicInfo = projectdompoint->domDocument.createElement("BasicInfo");
     QDomElement ProjectName = projectdompoint->domDocument.createElement("ProjectName");
     QDomElement ProjectDate = projectdompoint->domDocument.createElement("ProjectDate");
+    QDomElement ProjectCategory = projectdompoint->domDocument.createElement("ProjectCategory");
+    QDomElement ProjectStepSize = projectdompoint->domDocument.createElement("ProjectStepSize");
+
     QDomElement WellName  = projectdompoint->domDocument.createElement("WellName");
     QDomElement WellXing  = projectdompoint->domDocument.createElement("WellXing");
     QDomElement WellBie   = projectdompoint->domDocument.createElement("WellBie");
     QDomElement WellDepth = projectdompoint->domDocument.createElement("WellDepth");
 
+    QDomElement DataBaseFile = projectdompoint->domDocument.createElement("DataBaseFile");
+
     QDomText nameText = projectdompoint->domDocument.createTextNode(projectdompoint->projectName);
     QDomText dateText = projectdompoint->domDocument.createTextNode(date.toString("yyyy-MM-dd"));
+    QDomText categoryText;
+    if(projectdompoint->projectIsrealtime){
+        categoryText = projectdompoint->domDocument.createTextNode("RealTime");
+    }else {
+        categoryText = projectdompoint->domDocument.createTextNode("Forcast");
+    }
+    QDomText stepSize = projectdompoint->domDocument.createTextNode(field("FProjectStep").toString());
+    QDomText wellname = projectdompoint->domDocument.createTextNode(field("FwellName").toString());
+    QDomText wellxing = projectdompoint->domDocument.createTextNode(field("FwellXing").toString());
+    QDomText wellbie = projectdompoint->domDocument.createTextNode(field("FwellFBie").toString());
+    QDomText welldepth = projectdompoint->domDocument.createTextNode(field("FwellDepth").toString());
+    QDomText databasefile = projectdompoint->domDocument.createTextNode(QDir::currentPath()+"/dpdeault.csv");
     ProjectName.appendChild(nameText);
     ProjectDate.appendChild(dateText);
+    ProjectCategory.appendChild(categoryText);
+    ProjectStepSize.appendChild(stepSize);
+    WellName.appendChild(wellname);
+    WellXing.appendChild(wellxing);
+    WellBie.appendChild(wellbie);
+    WellDepth.appendChild(welldepth);
+    DataBaseFile.appendChild(databasefile);
 
     BasicInfo.appendChild(ProjectName);
     BasicInfo.appendChild(ProjectDate);
+    BasicInfo.appendChild(ProjectCategory);
+    BasicInfo.appendChild(ProjectStepSize);
     BasicInfo.appendChild(WellName);
     BasicInfo.appendChild(WellXing);
     BasicInfo.appendChild(WellBie);
     BasicInfo.appendChild(WellDepth);
+    BasicInfo.appendChild(DataBaseFile);
 
     Root.appendChild(BasicInfo);
+
+//    if(projectdompoint->projectIsrealtime){
+          QDomElement StatusInfo = projectdompoint->domDocument.createElement("StatusInfo");
+          QDomElement StatusKai = projectdompoint->domDocument.createElement("kaiNo");
+          QDomElement StatusCi = projectdompoint->domDocument.createElement("CiNo");
+          QDomText KaiText = projectdompoint->domDocument.createTextNode("0");
+          QDomText CiText = projectdompoint->domDocument.createTextNode("0");
+          StatusKai.appendChild(KaiText);
+          StatusCi.appendChild(CiText);
+          StatusInfo.appendChild(StatusKai);
+          StatusInfo.appendChild(StatusCi);
+          Root.appendChild(StatusInfo);
+//    };
+
     projectdompoint->domDocument.appendChild(Root);
 }
 
@@ -94,6 +135,9 @@ CreateProPage::CreateProPage(QWidget *parent)
     estimateProRadioButton = new QRadioButton(QString::fromLocal8Bit("开钻前估算"));
 
     realtimeProRadioButton->setChecked(true);
+
+    registerField("FproRealtime", realtimeProRadioButton);
+
     QVBoxLayout *groupBoxLayout = new QVBoxLayout;
 //! [12]
     groupBoxLayout->addWidget(realtimeProRadioButton);
@@ -107,6 +151,9 @@ CreateProPage::CreateProPage(QWidget *parent)
     layout->addWidget(browseButton, 1, 4,1,1);
     layout->addWidget(groupBox, 3, 0,1,5);
    setLayout(layout);
+  // qDebug() << groupBox->checkedId();
+  // qDebug() << groupBox->checkedButton();
+
 }
 
 
@@ -120,9 +167,13 @@ ProInfoPage::ProInfoPage(QWidget *parent)
    // setPixmap(QWizard::LogoPixmap, QPixmap(":/images/logo1.png"));
 
 //! [10]
-    wellNameLabel = new QLabel(QString::fromLocal8Bit("井名:"));
+    wellNameLabel = new QLabel(QString::fromLocal8Bit("井名(*):"));
     wellNameLineEdit = new QLineEdit;
     wellNameLabel->setBuddy(wellNameLineEdit);
+
+    projectStepSizeLabel = new QLabel(QString::fromLocal8Bit("计算步长(米)(*):"));
+    projectStepLineEdit = new QLineEdit;
+    projectStepSizeLabel->setBuddy(wellNameLineEdit);
 
     wellXingLabel = new QLabel(QString::fromLocal8Bit("井型:"));
     wellXingLineEdit = new QLineEdit;
@@ -137,21 +188,25 @@ ProInfoPage::ProInfoPage(QWidget *parent)
     wellDepthLabel->setBuddy(wellDepthLineEdit);
 
     registerField("FwellName*", wellNameLineEdit);
+    registerField("FProjectStep*", projectStepLineEdit);
     registerField("FwellXing", wellXingLineEdit);
     registerField("FwellFBie", wellBieLineEdit);
     registerField("FwellDepth", wellDepthLineEdit);
-
+   // QSpacerItem* horizontalSpacer = new QSpacerItem(300, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QGridLayout *layout = new QGridLayout;
     layout->setColumnMinimumWidth(0, 20);
     layout->addWidget(wellNameLabel, 0, 0);
     layout->addWidget(wellNameLineEdit, 0, 1);
-    layout->addWidget(wellXingLabel, 1, 0);
-    layout->addWidget(wellXingLineEdit, 1, 1);
-    layout->addWidget(wellBieLabel, 2, 0);
-    layout->addWidget(wellBieLineEdit, 2, 1);
-    layout->addWidget(wellDepthLabel, 3, 0);
-    layout->addWidget(wellDepthLineEdit, 3, 1);
+    layout->addWidget(projectStepSizeLabel, 1, 0);
+    layout->addWidget(projectStepLineEdit, 1, 1);
+    //layout->addItem(horizontalSpacer,2,0,1,1);
+    layout->addWidget(wellXingLabel, 3, 0);
+    layout->addWidget(wellXingLineEdit, 3, 1);
+    layout->addWidget(wellBieLabel, 4, 0);
+    layout->addWidget(wellBieLineEdit, 4, 1);
+    layout->addWidget(wellDepthLabel, 5, 0);
+    layout->addWidget(wellDepthLineEdit, 5, 1);
     setLayout(layout);
 
 }
@@ -169,6 +224,7 @@ void CreateProWizard::accept()
     //判断该项目是否存在
     QString prodir  = field("FproDir").toString();
     QString proname = field("FproName").toString();
+    bool    projectisreal = field("FproRealtime").toBool();
     QString  folder = prodir+"/"+proname;
 
     QDir dir;
@@ -184,6 +240,7 @@ void CreateProWizard::accept()
         {
             projectdompoint->projectName = proname;
             projectdompoint->projectDir  = prodir+"/"+proname;
+            projectdompoint->projectIsrealtime = projectisreal;
             CreateQDom();
             QDialog::accept();
         }

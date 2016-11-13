@@ -1,13 +1,14 @@
 ﻿#ifndef CALCWIZARD_H
 #define CALCWIZARD_H
 #include <QWizard>
+#include <QWidget>
 #include <QtWidgets>
 #include "projectdom.h"
 
 class CalcWizard : public QWizard
 {
 public:
-    CalcWizard(ProjectDom * tmpprodompoint);
+    CalcWizard(ProjectDom * tmpprodompoint, QWidget *parent = 0);
     ProjectDom * projectdompoint;
 };
 
@@ -24,7 +25,7 @@ private:
     QLabel      * procatLabel;
     QLabel      * procatLabel2;
     QLabel      * setstepLabel;
-    QLineEdit   * setstepLineEdit;
+    QLabel      * setstepContentLabel;
 
 };
 
@@ -34,7 +35,11 @@ class ShowAndEditDialog : public QDialog
 public:
     ShowAndEditDialog(ProjectDom * tmpprodompoint, QWidget *parent = 0);
     ProjectDom * projectdompoint;
+    void setTaoguan();
+    void setLuoyan();
 private:
+    QLabel *taoguanLabel;
+    QLabel *luoyanLabel;
 
 };
 

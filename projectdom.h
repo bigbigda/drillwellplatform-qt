@@ -8,14 +8,23 @@
 class ProjectDom
 {
 public:
-    ProjectDom(QDomDocument document, QObject *parent = 0);
+    ProjectDom(QDomDocument document);
     QDomDocument domDocument;
     QString projectName;
     QString projectDir;
+    bool    projectIsrealtime;
+
     void    InitWriteXml();
-    void    ProjectChanged();
-    void    ProjectSaved();
-    bool    ProjectNotSaved();
+    int     showKaiInfo();
+    int     showCiInfo();
+    QString  showStepSize();
+    double  backStepSize();
+    QString showDataBaseFile();
+    void    setDataBaseFile(QString newfile);
+
+    void    projectChanged();
+    void    projectSaved();
+    bool    showNotSaveFlag();
 private:
     bool    flagNeedToSave;
 };

@@ -62,6 +62,8 @@ public:
 private:
     QLabel    * wellNameLabel;
     QLineEdit * wellNameLineEdit;
+    QLabel    * projectStepSizeLabel;
+    QLineEdit * projectStepLineEdit;
     QLabel    * wellXingLabel;
     QLineEdit * wellXingLineEdit;
     QLabel    * wellBieLabel;
