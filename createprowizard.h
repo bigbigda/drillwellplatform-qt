@@ -16,7 +16,10 @@ class CreateProWizard :  public QWizard
     Q_OBJECT
 
 public:
-    explicit CreateProWizard(ProjectDom * tmpdompoint ,QWidget *parent = 0);
+
+    enum {Page_Start, Page_Real, Page_Esti, Page_End};
+
+    CreateProWizard(ProjectDom * tmpdompoint ,QWidget *parent = 0);
     ~CreateProWizard();
     QString BackProjectName();
     QString BackProjectDir();
@@ -36,6 +39,7 @@ class CreateProPage : public QWizardPage
 public:
     CreateProPage(QWidget *parent = 0);
 
+    int nextId() const Q_DECL_OVERRIDE;
 private slots:
         void browse();
 private:
@@ -52,12 +56,49 @@ private:
     QGroupBox *groupBox;
     QPushButton *browseButton;
 };
+
+class KaiCiPage : public QWizardPage
+{
+    Q_OBJECT
+public:
+    KaiCiPage(QWidget *parent = 0);
+    int nextId() const Q_DECL_OVERRIDE;
+private:
+    QRadioButton *fromnewRadioButton;
+    QRadioButton *fromotherRadioButton;
+
+    QLabel * KaiLabel;
+    QLineEdit * KaiLineEdit;
+    QLabel * CiLabel;
+    QLineEdit * CiLineEdit;
+
+
+};
+
+class EstimitPage : public QWizardPage
+{
+    Q_OBJECT
+public:
+    EstimitPage(QWidget *parent = 0);
+private:
+    QRadioButton *HasDetailRadioButton;
+    QRadioButton *DontHasDetailRadioButton;
+    QGroupBox *groupBox;
+
+    QLabel * TaoFLabel;
+    QLineEdit * TaoFLineEdit;
+    QLabel * LuoFLabel;
+    QLineEdit * LuoFLineEdit;
+
+
+};
 class ProInfoPage : public QWizardPage
 {
     Q_OBJECT
 
 public:
     ProInfoPage(QWidget *parent = 0);
+
 
 private:
     QLabel    * wellNameLabel;

@@ -3,7 +3,8 @@
 
 #include <QMainWindow>
 #include <QImage>
-
+#include "excelfile.h"
+#include "enterdata.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,6 +23,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void MainWindow::closeEvent (QCloseEvent *event);
+
 private:
 
 private slots:
@@ -40,6 +42,10 @@ private slots:
     void on_action_LaF_triggered();
 
     void on_action_set_triggered();
+
+    void on_action_ReadExcel_triggered();
+
+    void on_action_EnterData_triggered();
 
 private:
     Ui::MainWindow *ui;

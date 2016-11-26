@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui xml
+QT       += axcontainer
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = drillingPlatform
@@ -18,7 +19,11 @@ SOURCES += main.cpp\
     calcwizard.cpp \
     waitingspinnerwidget.cpp \
     qcustomplot.cpp \
-    plotview.cpp
+    plotview.cpp \
+    readbasicexcel.cpp \
+    csvfile.cpp \
+    enterdata.cpp \
+    excelfile.cpp
 
 HEADERS  += mainwindow.h \
     projectdom.h \
@@ -26,9 +31,12 @@ HEADERS  += mainwindow.h \
     calcwizard.h \
     waitingspinnerwidget.h \
     qcustomplot.h \
-    plotview.h
+    plotview.h \
+    readbasicexcel.h \
+    csvfile.h \
+    enterdata.h \
+    excelfile.h
 
 FORMS    += mainwindow.ui
 
-RESOURCES += \
-    image.qrc
+RESOURCES +=

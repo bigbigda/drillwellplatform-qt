@@ -10,9 +10,14 @@ CreateProWizard::CreateProWizard(ProjectDom *tmpdompoint, QWidget *parent)
 {
     projectdompoint = tmpdompoint;
 
+    setPage(Page_Start, new CreateProPage);
+    setPage(Page_Real, new KaiCiPage);
+    setPage(Page_Esti, new EstimitPage);
+    setPage(Page_End, new ProInfoPage);
+
     setWizardStyle(ClassicStyle);
-    addPage(new CreateProPage);
-    addPage(new ProInfoPage);
+//    addPage(new CreateProPage);
+//    addPage(new ProInfoPage);
     setWindowTitle(QString::fromLocal8Bit("计算"));
     setOption(QWizard::IndependentPages);
 }
@@ -67,7 +72,7 @@ void CreateProWizard::CreateQDom()
     QDomText wellxing = projectdompoint->domDocument.createTextNode(field("FwellXing").toString());
     QDomText wellbie = projectdompoint->domDocument.createTextNode(field("FwellFBie").toString());
     QDomText welldepth = projectdompoint->domDocument.createTextNode(field("FwellDepth").toString());
-    QDomText databasefile = projectdompoint->domDocument.createTextNode(QDir::currentPath()+"/dpdeault.csv");
+    QDomText databasefile = projectdompoint->domDocument.createTextNode(QDir::currentPath()+"/defeault.csv");
     ProjectName.appendChild(nameText);
     ProjectDate.appendChild(dateText);
     ProjectCategory.appendChild(categoryText);
@@ -104,6 +109,16 @@ void CreateProWizard::CreateQDom()
 //    };
 
     projectdompoint->domDocument.appendChild(Root);
+}
+
+int CreateProPage::nextId() const
+//! [17] //! [19]
+{
+    if (realtimeProRadioButton->isChecked()) {
+        return CreateProWizard::Page_Real;
+    } else {
+        return CreateProWizard::Page_Esti;
+    }
 }
 
 CreateProPage::CreateProPage(QWidget *parent)
@@ -156,6 +171,97 @@ CreateProPage::CreateProPage(QWidget *parent)
 
 }
 
+int KaiCiPage::nextId() const
+//! [17] //! [19]
+{
+    return CreateProWizard::Page_End;
+}
+KaiCiPage::KaiCiPage(QWidget *parent)
+    : QWizardPage(parent)
+{
+    setTitle(QString::fromLocal8Bit("初始开次信息"));
+   // setSubTitle(QString::fromLocal8Bit("确定第一次计算时开数和次数."));
+
+    fromnewRadioButton = new QRadioButton(QString::fromLocal8Bit("& 从第1开第1次开始"));
+
+    fromotherRadioButton = new QRadioButton(QString::fromLocal8Bit("& 指定开始开次"));
+
+    KaiLabel = new QLabel(QString::fromLocal8Bit("&开始开数:"));
+    KaiLineEdit = new QLineEdit;
+    KaiLabel->setBuddy(KaiLineEdit);
+
+    CiLabel = new QLabel(QString::fromLocal8Bit("&开始次数:"));
+    CiLineEdit = new QLineEdit;
+    CiLabel->setBuddy(CiLineEdit);
+
+    KaiLineEdit->setValidator( new QIntValidator(0, 65536, this) );
+    KaiLineEdit->setValidator( new QIntValidator(0, 65536, this) );
+
+    registerField("fromNew", fromnewRadioButton);
+    registerField("otherKaiNum", KaiLineEdit);
+    registerField("otherCiNum", CiLineEdit);
+
+    connect(fromotherRadioButton, &QAbstractButton::toggled,
+            KaiLineEdit, &QWidget::setEnabled);
+    connect(fromotherRadioButton, &QAbstractButton::toggled,
+            CiLineEdit, &QWidget::setEnabled);
+
+    fromnewRadioButton->toggle();
+    KaiLineEdit->setEnabled(0);
+    CiLineEdit->setEnabled(0);
+
+    QGridLayout *layout = new QGridLayout;
+    layout->setColumnMinimumWidth(0, 20);
+    layout->addWidget(fromnewRadioButton, 0, 0, 1, 3);
+    layout->addWidget(fromotherRadioButton, 1, 0, 1, 3);
+    layout->addWidget(KaiLabel, 2, 1);
+    layout->addWidget(KaiLineEdit, 2, 2);
+    layout->addWidget(CiLabel, 3, 1);
+    layout->addWidget(CiLineEdit, 3, 2);
+
+    setLayout(layout);
+
+}
+
+EstimitPage::EstimitPage(QWidget *parent)
+{
+    setTitle(QString::fromLocal8Bit("钻前估算模式设置"));
+
+    TaoFLabel = new QLabel(QString::fromLocal8Bit("&套管段摩擦系数:"));
+    TaoFLineEdit = new QLineEdit;
+    TaoFLabel->setBuddy(TaoFLineEdit);
+
+    LuoFLabel = new QLabel(QString::fromLocal8Bit("&裸眼段摩擦系数:"));
+    LuoFLineEdit = new QLineEdit;
+    LuoFLabel->setBuddy(LuoFLineEdit);
+
+    TaoFLineEdit->setValidator( new QDoubleValidator(0, 10000, 3, this) );
+    LuoFLineEdit->setValidator( new QDoubleValidator(0, 10000, 3, this) );
+
+    groupBox = new QGroupBox(QString::fromLocal8Bit("详细钻具组合"));
+    HasDetailRadioButton = new QRadioButton(QString::fromLocal8Bit("有"));
+    DontHasDetailRadioButton = new QRadioButton(QString::fromLocal8Bit("无"));
+    HasDetailRadioButton->setChecked(true);
+
+    registerField("taoMoxi*", TaoFLineEdit);
+    registerField("luoMoxi*", LuoFLineEdit);
+    registerField("hasXiangbzh", HasDetailRadioButton);
+
+    QVBoxLayout *groupBoxLayout = new QVBoxLayout;
+    groupBoxLayout->addWidget(HasDetailRadioButton);
+    groupBoxLayout->addWidget(DontHasDetailRadioButton);
+    groupBox->setLayout(groupBoxLayout);
+
+    QGridLayout *layout = new QGridLayout;
+    layout->setColumnMinimumWidth(0, 20);
+    layout->addWidget(TaoFLabel, 1, 0);
+    layout->addWidget(TaoFLineEdit, 1, 1);
+    layout->addWidget(LuoFLabel, 2, 0);
+    layout->addWidget(LuoFLineEdit, 2, 1);
+    layout->addWidget(groupBox, 3, 0,1,3);
+
+    setLayout(layout);
+}
 
 ProInfoPage::ProInfoPage(QWidget *parent)
     : QWizardPage(parent)
@@ -171,9 +277,11 @@ ProInfoPage::ProInfoPage(QWidget *parent)
     wellNameLineEdit = new QLineEdit;
     wellNameLabel->setBuddy(wellNameLineEdit);
 
-    projectStepSizeLabel = new QLabel(QString::fromLocal8Bit("计算步长(米)(*):"));
+    projectStepSizeLabel = new QLabel(QString::fromLocal8Bit("计算步长(米)(≤9)(*):"));
     projectStepLineEdit = new QLineEdit;
     projectStepSizeLabel->setBuddy(wellNameLineEdit);
+
+    projectStepLineEdit->setValidator( new QIntValidator(1, 9, this) );
 
     wellXingLabel = new QLabel(QString::fromLocal8Bit("井型:"));
     wellXingLineEdit = new QLineEdit;
@@ -226,11 +334,20 @@ void CreateProWizard::accept()
     QString proname = field("FproName").toString();
     bool    projectisreal = field("FproRealtime").toBool();
     QString  folder = prodir+"/"+proname;
+    QString Sstep = field("FProjectStep").toString();
+    double Dstep = Sstep.toDouble();
 
     QDir dir;
     if(!dir.exists(folder))
     {
-        if(dir.mkdir(folder) == false)
+        if(Dstep > 9 || Dstep < 0)
+        {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle(QString::fromLocal8Bit("警告"));
+            msgBox.setText(QString::fromLocal8Bit("步长范围不正确，请重新输入"));
+            msgBox.exec();
+
+        } else if(dir.mkdir(folder) == false)
         {
             QMessageBox msgBox;
             msgBox.setWindowTitle(QString::fromLocal8Bit("警告"));

@@ -7,6 +7,7 @@
 #include <calcwizard.h>
 #include "qcustomplot.h"
 #include "plotview.h"
+#include <readbasicexcel.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,8 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
     createprodialogPoint = 0;
     setWindowTitle(QString::fromLocal8Bit("钻井计算平台"));
 
-    ui->menu_3->setEnabled(0);
-    ui->action_set->setEnabled(0);
+//    ui->menu_3->setEnabled(0);
+//    ui->action_set->setEnabled(0);
+//    ui->action_ReadExcel->setEnabled(0);
+//    ui->action_Shuju->setEnabled(0);
 }
 
 MainWindow::~MainWindow()
@@ -72,11 +75,14 @@ void MainWindow::on_action_New_triggered()
    //     qInfo() << "confirmed";
 
         this->projectdompoint->InitWriteXml();
+    //    wellProject *project = new wellProject(projectdompoint->showKaiInfo(),projectdompoint->showCiInfo(),
+    //                                           projectdompoint->projectDir,projectdompoint->projectIsrealtime,NULL);
+
+        ui->action_ReadExcel->setEnabled(1);
+        ui->menu_3->setEnabled(1);
+        ui->action_set->setEnabled(1);
     }
         delete createprodialogPoint;
-
-    ui->menu_3->setEnabled(1);
-    ui->action_set->setEnabled(1);
 }
 
 void MainWindow::on_action_Open_triggered()
@@ -116,6 +122,7 @@ void MainWindow::on_action_Open_triggered()
 
         projectdompoint->projectIsrealtime = (ProjectCategory.text() == "RealTime");
 
+        ui->action_ReadExcel->setEnabled(1);
         ui->menu_3->setEnabled(1);
         ui->action_set->setEnabled(1);
     }
@@ -151,4 +158,52 @@ void MainWindow::on_action_set_triggered()
         msgBox.exec();
     }
 
+}
+
+void MainWindow::on_action_ReadExcel_triggered()
+{
+    qDebug("!!!!!!!!!!!!!!!!!!!!");
+    qDebug((QCoreApplication::applicationDirPath()).toLatin1());
+    qDebug(QDir::currentPath().toLatin1());
+    qDebug("!!!!!!!!!!!!!!!!!!!!");
+//    QFile Fout1(projectdompoint->showDataBaseFile());
+//    if(!Fout1.exists()){
+//        QMessageBox msgBox;
+//        msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
+//        msgBox.setText(QString::fromLocal8Bit("杆数据库不存在      "));
+//        msgBox.exec();
+//        return;
+//    }
+
+    QString zuanjuDbPath = QDir::currentPath()+"/zuanjuDb.csv";
+
+    QFile Fout2(zuanjuDbPath);
+    if(!Fout2.exists()){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
+        msgBox.setText(QString::fromLocal8Bit("钻具数据库不存在      "));
+        msgBox.exec();
+        return;
+    }
+
+    projectdompoint->cfilep[0] = new CsvFile(zuanjuDbPath);
+    //projectdompoint->cfile[1] = new CsvFile(projectdompoint->showDataBaseFile());
+    ReadBasicExcel * readbasicexcel = new ReadBasicExcel(this->projectdompoint, this);
+
+    if (readbasicexcel->exec() != QDialog::Accepted)
+    {
+            ui->action_EnterData->setEnabled(1);
+    }
+        return;
+}
+
+
+void MainWindow::on_action_EnterData_triggered()
+{
+    EnterData*  enterdata = new EnterData(this->projectdompoint, this);
+    if (enterdata->exec() != QDialog::Accepted)
+    {
+      //      ui->action_Shuju->setEnabled(1);
+    }
+        return;
 }

@@ -1,12 +1,13 @@
-#ifndef PLOTVIEW_H
+﻿#ifndef PLOTVIEW_H
 #define PLOTVIEW_H
 
-#include <QWidget>
-
-class plotview
+#include <QDialog>
+#include "qcustomplot.h"
+class PlotView : public QDialog
 {
 public:
-    plotview();
+    PlotView(QWidget *parent = 0);
+    QCustomPlot *customPlot;
 };
 
 #endif // PLOTVIEW_H

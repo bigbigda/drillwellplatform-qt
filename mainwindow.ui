@@ -65,6 +65,8 @@
     <property name="title">
      <string>数据录入</string>
     </property>
+    <addaction name="action_ReadExcel"/>
+    <addaction name="action_EnterData"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -144,6 +146,19 @@
    </property>
    <property name="toolTip">
     <string>设置数据库路径</string>
+   </property>
+  </action>
+  <action name="action_ReadExcel">
+   <property name="text">
+    <string>Excel读取</string>
+   </property>
+  </action>
+  <action name="action_EnterData">
+   <property name="text">
+    <string>数据输入</string>
+   </property>
+   <property name="toolTip">
+    <string>数据输入</string>
    </property>
   </action>
  </widget>

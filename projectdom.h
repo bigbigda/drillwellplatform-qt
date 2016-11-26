@@ -3,7 +3,18 @@
 
 #include <QDomDocument>
 #include <QAbstractItemModel>
-//class DomItem;
+
+#include <excelfile.h>
+#include <csvfile.h>
+#include <excelfile.h>
+
+struct TableInf{
+    QString         tableName;
+    QStringList     tableRowHeadTag;
+    QStringList     tableConstData[5];
+    int             tableColNum;
+    int             tableRowNum;
+};
 
 class ProjectDom
 {
@@ -21,10 +32,15 @@ public:
     double  backStepSize();
     QString showDataBaseFile();
     void    setDataBaseFile(QString newfile);
+    void    InitTableStruct();
 
     void    projectChanged();
     void    projectSaved();
     bool    showNotSaveFlag();
+
+    ExcelFile * efilep[4];
+    CsvFile   * cfilep[2];
+    TableInf    tableinf[2];
 private:
     bool    flagNeedToSave;
 };
