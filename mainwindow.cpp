@@ -1,27 +1,23 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtWidgets>
-#include <createprowizard.h>
-#include <projectdom.h>
-#include <QCloseEvent>
-#include <calcwizard.h>
-#include "qcustomplot.h"
-#include "plotview.h"
-#include <readbasicexcel.h>
+#include <QIcon>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
     projectdompoint = 0;
     createprodialogPoint = 0;
-    setWindowTitle(QString::fromLocal8Bit("钻井计算平台"));
 
-//    ui->menu_3->setEnabled(0);
-//    ui->action_set->setEnabled(0);
-//    ui->action_ReadExcel->setEnabled(0);
-//    ui->action_Shuju->setEnabled(0);
+    setWindowTitle(QString::fromLocal8Bit("钻井计算平台"));
+//    setWindowIcon(QIcon(":/new/qt.png"));
+    ui->action_set->setEnabled(false);
+    ui->action_ReadExcel->setEnabled(false);
+    ui->action_EnterData->setEnabled(1);
+    ui->action_Cal->setEnabled(1);
+    ui->action_Save->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -36,15 +32,15 @@ void MainWindow::closeEvent (QCloseEvent *event)
     {
         event->accept();
     } else  if(projectdompoint->showNotSaveFlag()){
-    QMessageBox::StandardButton resBtn = QMessageBox::question( this, projectdompoint->projectName,
-                                                                QString::fromLocal8Bit("Are you sure?\n"),
-                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-                                                                QMessageBox::Yes);
-    if (resBtn != QMessageBox::Yes) {
-        event->ignore();
-    } else {
-        event->accept();
-    }
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, projectdompoint->projectName,
+                QString::fromLocal8Bit("Are you sure?\n"), QMessageBox::Cancel
+                | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+
+        if (resBtn != QMessageBox::Yes) {
+            event->ignore();
+        } else {
+            event->accept();
+        }
     }
 
 }
@@ -67,42 +63,34 @@ void MainWindow::on_action_New_triggered()
         delete projectdompoint;
     }
 
-    projectdompoint = new ProjectDom(QDomDocument());
+    projectdompoint = new ProjectDom();
     createprodialogPoint = new CreateProWizard(this->projectdompoint,this);
 
     if(createprodialogPoint->exec() == QDialog::Accepted)
     {
-   //     qInfo() << "confirmed";
-
         this->projectdompoint->InitWriteXml();
-    //    wellProject *project = new wellProject(projectdompoint->showKaiInfo(),projectdompoint->showCiInfo(),
-    //                                           projectdompoint->projectDir,projectdompoint->projectIsrealtime,NULL);
 
-        ui->action_ReadExcel->setEnabled(1);
-        ui->menu_3->setEnabled(1);
-        ui->action_set->setEnabled(1);
+        ui->action_ReadExcel->setEnabled(true);
+        ui->action_set->setEnabled(true);
+        ui->action_EnterData->setEnabled(1);
+        ui->action_Cal->setEnabled(false);
     }
         delete createprodialogPoint;
 }
 
 void MainWindow::on_action_Open_triggered()
 {
-
-
     if(projectdompoint != 0)
     {
         delete projectdompoint;
     }
-
-    projectdompoint = new ProjectDom(QDomDocument());
+    projectdompoint = new ProjectDom();
 
     QString file = QFileDialog::getOpenFileName(
                 this,QString::fromLocal8Bit("打开项目"), "", "dp-project (*.dpro )"
                         );
     if (file != NULL)
     {
-        QByteArray bytarr = file.toLatin1();
-        qInfo(bytarr.data());
         //读取xml, 重建DOM
         QFile xmlFile(file);
         if (!xmlFile.exists() || !xmlFile.open(QFile::ReadOnly | QFile::Text)) {
@@ -122,9 +110,10 @@ void MainWindow::on_action_Open_triggered()
 
         projectdompoint->projectIsrealtime = (ProjectCategory.text() == "RealTime");
 
-        ui->action_ReadExcel->setEnabled(1);
-        ui->menu_3->setEnabled(1);
-        ui->action_set->setEnabled(1);
+        ui->action_ReadExcel->setEnabled(true);
+        ui->action_set->setEnabled(true);
+        ui->action_EnterData->setEnabled(1);
+        ui->action_Cal->setEnabled(false);
     }
 }
 
@@ -138,7 +127,7 @@ void MainWindow::on_action_Cal_triggered()
 
 void MainWindow::on_action_LaF_triggered()
 {
-    PlotView * plotpoint = new PlotView;
+    PlotView * plotpoint = new PlotView(this);
     plotpoint->exec();
 }
 
@@ -157,7 +146,6 @@ void MainWindow::on_action_set_triggered()
         msgBox.setText(QString::fromLocal8Bit("数据库设置错误      "));
         msgBox.exec();
     }
-
 }
 
 void MainWindow::on_action_ReadExcel_triggered()
@@ -166,44 +154,51 @@ void MainWindow::on_action_ReadExcel_triggered()
     qDebug((QCoreApplication::applicationDirPath()).toLatin1());
     qDebug(QDir::currentPath().toLatin1());
     qDebug("!!!!!!!!!!!!!!!!!!!!");
-//    QFile Fout1(projectdompoint->showDataBaseFile());
-//    if(!Fout1.exists()){
-//        QMessageBox msgBox;
-//        msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
-//        msgBox.setText(QString::fromLocal8Bit("杆数据库不存在      "));
-//        msgBox.exec();
-//        return;
-//    }
 
-    QString zuanjuDbPath = QDir::currentPath()+"/zuanjuDb.csv";
+    QString zuanjuDbPath = QCoreApplication::applicationDirPath()+"/zuanjuDb.csv";           //不变的数据库
+    QFile Fout1(zuanjuDbPath);
+    if(!Fout1.exists()){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
+        msgBox.setText(QString::fromLocal8Bit("钻具信息数据库不存在      "));
+        msgBox.exec();
+        return;
+    }
 
-    QFile Fout2(zuanjuDbPath);
+    QFile Fout2(projectdompoint->showDataBaseFile());                      //全局的数据库
     if(!Fout2.exists()){
         QMessageBox msgBox;
         msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
-        msgBox.setText(QString::fromLocal8Bit("钻具数据库不存在      "));
+        msgBox.setText(QString::fromLocal8Bit("杆数据库(全局)不存在      "));
         msgBox.exec();
         return;
     }
 
     projectdompoint->cfilep[0] = new CsvFile(zuanjuDbPath);
-    //projectdompoint->cfile[1] = new CsvFile(projectdompoint->showDataBaseFile());
+    projectdompoint->cfilep[1] = new CsvFile(projectdompoint->showDataBaseFile());
     ReadBasicExcel * readbasicexcel = new ReadBasicExcel(this->projectdompoint, this);
 
-    if (readbasicexcel->exec() != QDialog::Accepted)
+    for (int i = 0; i < projectdompoint->cfilep[0]->fileData.count() ; i++)
+    {
+     projectdompoint->tableinf[1].tableConstData[2].append(projectdompoint->cfilep[0]->fileData[i].at(2));
+     projectdompoint->tableinf[1].tableConstData[3].append(projectdompoint->cfilep[0]->fileData[i].at(3));
+    }
+    projectdompoint->tableinf[1].tableConstData[2].removeDuplicates();
+    projectdompoint->tableinf[1].tableConstData[3].removeDuplicates();
+
+    if (readbasicexcel->exec() == QDialog::Accepted)
     {
             ui->action_EnterData->setEnabled(1);
     }
         return;
 }
 
-
 void MainWindow::on_action_EnterData_triggered()
 {
     EnterData*  enterdata = new EnterData(this->projectdompoint, this);
     if (enterdata->exec() != QDialog::Accepted)
     {
-      //      ui->action_Shuju->setEnabled(1);
+      ui->action_Cal->setEnabled(1);
     }
         return;
 }

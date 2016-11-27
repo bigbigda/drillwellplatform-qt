@@ -1,16 +1,11 @@
 ﻿#include "readbasicexcel.h"
 
-#include <QBoxLayout>
-#include <QMessageBox>
-#include <QAxObject>
 ReadBasicExcel::ReadBasicExcel(ProjectDom * tmpdompoint ,QWidget *parent): QDialog(parent)
 {
     projectdompoint = tmpdompoint;
 
     resize(400,200);
     setWindowTitle(QString::fromLocal8Bit("读取Excel表格"));
-
-
 
     jingyanLabel = new QLabel(QString::fromLocal8Bit("&井眼轨迹数据:"));
     jingyanLineEdit = new QLineEdit;
@@ -180,10 +175,6 @@ bool ReadBasicExcel::readandcheckfile(QFileInfo fread1info,QFileInfo fread2info,
         return false;
     }
 
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(QString::fromLocal8Bit("!!"));
-    msgBox.setText(QString::fromLocal8Bit("wait        "));
-    msgBox.exec();
     return true;
 }
 

@@ -1,9 +1,4 @@
 ﻿#include "createprowizard.h"
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QDomDocument>
-#include <QDate>
-#include <QtWidgets>
 
 CreateProWizard::CreateProWizard(ProjectDom *tmpdompoint, QWidget *parent)
   : QWizard(parent)
@@ -16,8 +11,6 @@ CreateProWizard::CreateProWizard(ProjectDom *tmpdompoint, QWidget *parent)
     setPage(Page_End, new ProInfoPage);
 
     setWizardStyle(ClassicStyle);
-//    addPage(new CreateProPage);
-//    addPage(new ProInfoPage);
     setWindowTitle(QString::fromLocal8Bit("计算"));
     setOption(QWizard::IndependentPages);
 }
@@ -27,15 +20,6 @@ CreateProWizard::~CreateProWizard()
 
 }
 
-QString CreateProWizard::BackProjectName()
-{
-    return 0;       //change
-}
-
-QString CreateProWizard::BackProjectDir()
-{
-    return 0;       //change
-}
 
 void CreateProWizard::CreateQDom()
 {
@@ -72,7 +56,7 @@ void CreateProWizard::CreateQDom()
     QDomText wellxing = projectdompoint->domDocument.createTextNode(field("FwellXing").toString());
     QDomText wellbie = projectdompoint->domDocument.createTextNode(field("FwellFBie").toString());
     QDomText welldepth = projectdompoint->domDocument.createTextNode(field("FwellDepth").toString());
-    QDomText databasefile = projectdompoint->domDocument.createTextNode(QDir::currentPath()+"/defeault.csv");
+    QDomText databasefile = projectdompoint->domDocument.createTextNode(QCoreApplication::applicationDirPath()+"/default.csv");
     ProjectName.appendChild(nameText);
     ProjectDate.appendChild(dateText);
     ProjectCategory.appendChild(categoryText);
@@ -95,24 +79,53 @@ void CreateProWizard::CreateQDom()
 
     Root.appendChild(BasicInfo);
 
-//    if(projectdompoint->projectIsrealtime){
-          QDomElement StatusInfo = projectdompoint->domDocument.createElement("StatusInfo");
-          QDomElement StatusKai = projectdompoint->domDocument.createElement("kaiNo");
-          QDomElement StatusCi = projectdompoint->domDocument.createElement("CiNo");
-          QDomText KaiText = projectdompoint->domDocument.createTextNode("0");
-          QDomText CiText = projectdompoint->domDocument.createTextNode("0");
+    QDomElement SpecificInfo = projectdompoint->domDocument.createElement("SpecificInfo");
+
+    if(projectdompoint->projectIsrealtime){
+          QDomElement hasfinishfisrt = projectdompoint->domDocument.createElement("HasFinishFisrt");
+          QDomElement StatusKai = projectdompoint->domDocument.createElement("CurrentkaiNo");
+          QDomElement StatusCi = projectdompoint->domDocument.createElement("CurrentCiNo");
+          QDomText hasfinishfisrtText = projectdompoint->domDocument.createTextNode("0");
+          QDomText KaiText, CiText;
+          if(field("fromNew").toBool()){
+            KaiText = projectdompoint->domDocument.createTextNode("1");
+            CiText = projectdompoint->domDocument.createTextNode("1");
+          }else {
+              KaiText = projectdompoint->domDocument.createTextNode(field("otherKaiNum").toString());
+              CiText = projectdompoint->domDocument.createTextNode(field("otherCiNum").toString());
+          }
+          hasfinishfisrt.appendChild(hasfinishfisrtText);
           StatusKai.appendChild(KaiText);
           StatusCi.appendChild(CiText);
-          StatusInfo.appendChild(StatusKai);
-          StatusInfo.appendChild(StatusCi);
-          Root.appendChild(StatusInfo);
-//    };
+          SpecificInfo.appendChild(hasfinishfisrt);
+          SpecificInfo.appendChild(StatusKai);
+          SpecificInfo.appendChild(StatusCi);
+
+    } else {
+        QDomElement taoguanmcxs = projectdompoint->domDocument.createElement("taoguanmcxs");
+        QDomElement luoyanmcxs = projectdompoint->domDocument.createElement("luoyanmcxs");
+        QDomElement hasdetailzjzh = projectdompoint->domDocument.createElement("hasdetailzjzh");
+        QDomText taoguanmcxsText = projectdompoint->domDocument.createTextNode(field("taoMoxi").toString());
+        QDomText luoyanmcxsText = projectdompoint->domDocument.createTextNode(field("luoMoxi").toString());
+        QDomText hasdetailzjzhText;
+        if (field("hasXiangbzh").toBool()){
+            hasdetailzjzhText = projectdompoint->domDocument.createTextNode("1");
+        }else{
+            hasdetailzjzhText = projectdompoint->domDocument.createTextNode("0");
+        }
+        taoguanmcxs.appendChild(taoguanmcxsText);
+        luoyanmcxs.appendChild(luoyanmcxsText);
+        hasdetailzjzh.appendChild(hasdetailzjzhText);
+        SpecificInfo.appendChild(taoguanmcxs);
+        SpecificInfo.appendChild(luoyanmcxs);
+        SpecificInfo.appendChild(hasdetailzjzh);
+    }
+    Root.appendChild(SpecificInfo);
 
     projectdompoint->domDocument.appendChild(Root);
 }
 
 int CreateProPage::nextId() const
-//! [17] //! [19]
 {
     if (realtimeProRadioButton->isChecked()) {
         return CreateProWizard::Page_Real;
@@ -154,7 +167,7 @@ CreateProPage::CreateProPage(QWidget *parent)
     registerField("FproRealtime", realtimeProRadioButton);
 
     QVBoxLayout *groupBoxLayout = new QVBoxLayout;
-//! [12]
+
     groupBoxLayout->addWidget(realtimeProRadioButton);
     groupBoxLayout->addWidget(estimateProRadioButton);
     groupBox->setLayout(groupBoxLayout);
@@ -172,7 +185,6 @@ CreateProPage::CreateProPage(QWidget *parent)
 }
 
 int KaiCiPage::nextId() const
-//! [17] //! [19]
 {
     return CreateProWizard::Page_End;
 }
@@ -195,7 +207,7 @@ KaiCiPage::KaiCiPage(QWidget *parent)
     CiLabel->setBuddy(CiLineEdit);
 
     KaiLineEdit->setValidator( new QIntValidator(0, 65536, this) );
-    KaiLineEdit->setValidator( new QIntValidator(0, 65536, this) );
+    CiLineEdit->setValidator( new QIntValidator(0, 65536, this) );
 
     registerField("fromNew", fromnewRadioButton);
     registerField("otherKaiNum", KaiLineEdit);
@@ -266,13 +278,11 @@ EstimitPage::EstimitPage(QWidget *parent)
 ProInfoPage::ProInfoPage(QWidget *parent)
     : QWizardPage(parent)
 {
-//! [8]
     setTitle(QString::fromLocal8Bit("基本信息"));
     setSubTitle(QString::fromLocal8Bit("在此处填写需要的基本信息，带*为必填项"));
 
    // setPixmap(QWizard::LogoPixmap, QPixmap(":/images/logo1.png"));
 
-//! [10]
     wellNameLabel = new QLabel(QString::fromLocal8Bit("井名(*):"));
     wellNameLineEdit = new QLineEdit;
     wellNameLabel->setBuddy(wellNameLineEdit);
@@ -324,7 +334,6 @@ void CreateProPage::browse()
     QString directory = QFileDialog::getExistingDirectory(this,
                                tr("Find Files"), QDir::currentPath());
     proDirLineEdit->setText(directory);
-
 }
 
 void CreateProWizard::accept()
@@ -340,14 +349,7 @@ void CreateProWizard::accept()
     QDir dir;
     if(!dir.exists(folder))
     {
-        if(Dstep > 9 || Dstep < 0)
-        {
-            QMessageBox msgBox;
-            msgBox.setWindowTitle(QString::fromLocal8Bit("警告"));
-            msgBox.setText(QString::fromLocal8Bit("步长范围不正确，请重新输入"));
-            msgBox.exec();
-
-        } else if(dir.mkdir(folder) == false)
+        if(dir.mkdir(folder) == false)
         {
             QMessageBox msgBox;
             msgBox.setWindowTitle(QString::fromLocal8Bit("警告"));
@@ -358,6 +360,7 @@ void CreateProWizard::accept()
             projectdompoint->projectName = proname;
             projectdompoint->projectDir  = prodir+"/"+proname;
             projectdompoint->projectIsrealtime = projectisreal;
+
             CreateQDom();
             QDialog::accept();
         }

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/new">
+        <file>qt.png</file>
+        <file>timg.jpg</file>
+        <file>qm.bmp</file>
+    </qresource>
+</RCC>

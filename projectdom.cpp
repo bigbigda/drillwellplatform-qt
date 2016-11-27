@@ -1,13 +1,17 @@
 ﻿#include "projectdom.h"
-#include <QFile>
-#include <QMessageBox>
-#include <QTextStream>
 
-ProjectDom::ProjectDom(QDomDocument document)
-    :domDocument (document)
+ProjectDom::ProjectDom()
 {
     projectSaved();
     InitTableStruct();
+    for (int i = 0; i < 4 ;i++) efilep[i] = 0;
+    for (int j = 0; j < 2 ;j++) cfilep[j] = 0;
+}
+
+ProjectDom::~ProjectDom()
+{
+    for (int i = 0; i < 4 ;i++) delete efilep[i];
+    for (int j = 0; j < 2 ;j++) delete cfilep[j];
 }
 
 void ProjectDom::InitTableStruct()
@@ -37,8 +41,8 @@ void ProjectDom::InitTableStruct()
 
     tableinf[1].tableConstData[0] << QString::fromLocal8Bit("钻杆") << QString::fromLocal8Bit("加重钻杆") << QString::fromLocal8Bit("钻铤");
     tableinf[1].tableConstData[1] << "G" << "S";
-    tableinf[1].tableConstData[2] << "60.325";
-    tableinf[1].tableConstData[3] << "73.025";
+//    tableinf[1].tableConstData[2] << "60.325";
+//    tableinf[1].tableConstData[3] << "73.025";
     tableinf[1].tableConstData[4] << "NC26" << "NC31" <<"NC40" <<"NC46" << "NC50" << "5 1/2FH" << "6 5/8FH";
 }
 void ProjectDom::projectChanged()
@@ -65,7 +69,6 @@ void    ProjectDom::InitWriteXml()
         msgBox.setText(QString::fromLocal8Bit("写文件错误,请检查"));
         msgBox.exec();
     }
-
     QTextStream out(&file);
     out.setCodec("UTF-8");
     this->domDocument.save(out, 4, QDomNode::EncodingFromTextStream);
@@ -113,13 +116,112 @@ QString ProjectDom::showDataBaseFile()
     QDomElement StatusInfoElement = DPProjectElement.firstChildElement("BasicInfo");
     QDomElement DataBaseElement = StatusInfoElement.firstChildElement("DataBaseFile");
     return DataBaseElement.text();
-
 }
-void    ProjectDom::setDataBaseFile(QString newfile)
+
+void ProjectDom::setDataBaseFile(QString newfile)
 {
     QDomElement DPProjectElement = domDocument.firstChildElement();
     QDomElement StatusInfoElement = DPProjectElement.firstChildElement("BasicInfo");
     QDomElement DataBaseElement = StatusInfoElement.firstChildElement("DataBaseFile");
     QDomText t = DataBaseElement.firstChild().toText();
     t.setData(newfile);
+}
+
+KaiCiNum ProjectDom::showKaiCiNum(){
+    KaiCiNum KaiCiValue;
+    if (this->projectIsrealtime){
+    QDomElement DPProjectElement = domDocument.firstChildElement();
+    QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+    QDomElement KaiNoElement = SpecificInfoElement.firstChildElement("CurrentkaiNo");
+    QDomElement CiNoElement = SpecificInfoElement.firstChildElement("CurrentCiNo");
+
+    KaiCiValue.kainum = KaiNoElement.text().toInt();
+    KaiCiValue.cinum = CiNoElement.text().toInt();
+    return KaiCiValue;
+    } else {
+        KaiCiValue.kainum=0;
+        KaiCiValue.cinum=0;
+        return KaiCiValue;
+    }
+}
+
+void ProjectDom::setKaiCiNum(KaiCiNum kaicinum)
+{
+    if (this->projectIsrealtime){
+    QDomElement DPProjectElement = domDocument.firstChildElement();
+    QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+    QDomElement KaiNoElement = SpecificInfoElement.firstChildElement("CurrentkaiNo");
+    QDomElement CiNoElement = SpecificInfoElement.firstChildElement("CurrentCiNo");
+    QDomText KaiNotext = KaiNoElement.firstChild().toText();
+    QDomText CiNotext = CiNoElement.firstChild().toText();
+    KaiNotext.setData(QString(kaicinum.kainum));
+    CiNotext.setData(QString(kaicinum.cinum));
+    }
+}
+bool ProjectDom::showHasFinishFirst()
+{
+    if (this->projectIsrealtime){
+    QDomElement DPProjectElement = domDocument.firstChildElement();
+    QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+    QDomElement HasFinishFirstElement = SpecificInfoElement.firstChildElement("HasFinishFisrt");
+    return HasFinishFirstElement.text().toInt();
+    } else{
+        return true;
+    }
+}
+void ProjectDom::setHasFinishFirst()
+{
+    if (this->projectIsrealtime){
+    QDomElement DPProjectElement = domDocument.firstChildElement();
+    QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+    QDomElement HasFinishFirstElement = SpecificInfoElement.firstChildElement("HasFinishFisrt");
+    QDomText HasFinishFirstText = HasFinishFirstElement.firstChild().toText();
+    HasFinishFirstText.setData("1");
+    }
+}
+
+bool ProjectDom::showHasDetail()
+{
+    if (this->projectIsrealtime){
+        return true;
+    } else{
+        QDomElement DPProjectElement = domDocument.firstChildElement();
+        QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+        QDomElement HasDetailElement = SpecificInfoElement.firstChildElement("hasdetailzjzh");
+        return HasDetailElement.text().toInt();
+    }
+}
+
+QString ProjectDom::showTaomo()
+{
+    if (this->projectIsrealtime){
+        return true;
+    } else{
+        QDomElement DPProjectElement = domDocument.firstChildElement();
+        QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+        QDomElement TaomoElement = SpecificInfoElement.firstChildElement("taoguanmcxs");
+        return TaomoElement.text();
+    }
+}
+
+QString ProjectDom::showLuomo()
+{
+    if (this->projectIsrealtime){
+        return true;
+    } else{
+        QDomElement DPProjectElement = domDocument.firstChildElement();
+        QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+        QDomElement LuomoElement = SpecificInfoElement.firstChildElement("luoyanmcxs");
+        return LuomoElement.text();
+    }
+}
+
+void ProjectDom::setLuomo(QString luomo){
+    if (this->projectIsrealtime == false){
+        QDomElement DPProjectElement = domDocument.firstChildElement();
+        QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+        QDomElement LuomoElement = SpecificInfoElement.firstChildElement("luoyanmcxs");
+        QDomText LuomoText = LuomoElement.firstChild().toText();
+        LuomoText.setData(luomo);
+    }
 }

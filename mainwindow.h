@@ -3,8 +3,17 @@
 
 #include <QMainWindow>
 #include <QImage>
+#include <QtWidgets>
+#include <QCloseEvent>
+
 #include "excelfile.h"
 #include "enterdata.h"
+#include <createprowizard.h>
+#include <projectdom.h>
+#include <calcwizard.h>
+#include "qcustomplot.h"
+#include "plotview.h"
+#include <readbasicexcel.h>
 
 namespace Ui {
 class MainWindow;

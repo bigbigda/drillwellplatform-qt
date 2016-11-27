@@ -2,8 +2,18 @@
 #define CREATEPRODIALOG_H
 
 #include <QWizard>
+#include <QFileDialog>
+#include <QDate>
+#include <QRadioButton>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QGroupBox>
+#include <QValidator>
+#include <QCoreApplication>
+
 #include "projectdom.h"
-#include <QtWidgets>
 
 class QCheckBox;
 class QGroupBox;
@@ -21,8 +31,7 @@ public:
 
     CreateProWizard(ProjectDom * tmpdompoint ,QWidget *parent = 0);
     ~CreateProWizard();
-    QString BackProjectName();
-    QString BackProjectDir();
+
     void        CreateQDom();
     ProjectDom * projectdompoint;
 
@@ -46,7 +55,6 @@ private:
     QLabel *label;
     QLabel *proNameLabel;
     QLineEdit *proNameLineEdit;
-
     QLabel *label2;
     QLabel *proDirLabel;
     QLineEdit *proDirLineEdit;

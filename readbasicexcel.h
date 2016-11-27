@@ -1,14 +1,16 @@
 ﻿#ifndef READBASICEXCEL_H
 #define READBASICEXCEL_H
 
-#include <qdialog.h>
-#include <projectdom.h>
 #include <QBoxLayout>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
+#include <QDialog>
+#include <QLabel>
+#include <QPushButton>
+#include <QLineEdit>
 #include <QFileDialog>
+#include <QAxObject>
+
 #include <excelfile.h>
+#include <projectdom.h>
 
 class ReadBasicExcel : public QDialog
 {

@@ -74,7 +74,7 @@
     </property>
     <addaction name="action_Cal"/>
     <addaction name="action_LaF"/>
-    <addaction name="actionA"/>
+    <addaction name="action_Save"/>
    </widget>
    <addaction name="menu1"/>
    <addaction name="menu_2"/>
@@ -135,9 +135,12 @@
     <string>显示</string>
    </property>
   </action>
-  <action name="actionA">
+  <action name="action_Save">
    <property name="text">
-    <string>更新数据库</string>
+    <string>保存计算结果</string>
+   </property>
+   <property name="toolTip">
+    <string>保存计算结果</string>
    </property>
   </action>
   <action name="action_set">

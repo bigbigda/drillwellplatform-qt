@@ -8,6 +8,8 @@ QT       += core gui xml
 QT       += axcontainer
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
+RC_ICONS = my2.ico
+
 TARGET = drillingPlatform
 TEMPLATE = app
 
@@ -39,4 +41,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-RESOURCES +=
+RESOURCES += \
+    icon/image.qrc
+
+DISTFILES +=
