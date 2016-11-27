@@ -83,23 +83,39 @@ void CreateProWizard::CreateQDom()
 
     if(projectdompoint->projectIsrealtime){
           QDomElement hasfinishfisrt = projectdompoint->domDocument.createElement("HasFinishFisrt");
-          QDomElement StatusKai = projectdompoint->domDocument.createElement("CurrentkaiNo");
-          QDomElement StatusCi = projectdompoint->domDocument.createElement("CurrentCiNo");
+          QDomElement currentKai = projectdompoint->domDocument.createElement("CurrentkaiNo");
+          QDomElement currentCi = projectdompoint->domDocument.createElement("CurrentCiNo");
           QDomText hasfinishfisrtText = projectdompoint->domDocument.createTextNode("0");
-          QDomText KaiText, CiText;
+          QDomText currentKaiText, currentCiText;
           if(field("fromNew").toBool()){
-            KaiText = projectdompoint->domDocument.createTextNode("1");
-            CiText = projectdompoint->domDocument.createTextNode("1");
+            currentKaiText = projectdompoint->domDocument.createTextNode("1");
+            currentCiText = projectdompoint->domDocument.createTextNode("1");
           }else {
-              KaiText = projectdompoint->domDocument.createTextNode(field("otherKaiNum").toString());
-              CiText = projectdompoint->domDocument.createTextNode(field("otherCiNum").toString());
+              currentKaiText = projectdompoint->domDocument.createTextNode(field("otherKaiNum").toString());
+              currentCiText = projectdompoint->domDocument.createTextNode(field("otherCiNum").toString());
           }
+          QDomElement startKai = projectdompoint->domDocument.createElement("StartkaiNo");
+          QDomElement startCi = projectdompoint->domDocument.createElement("StartCiNo");
+          QDomText startKaiText, startCiText;
+          if(field("fromNew").toBool()){
+            startKaiText = projectdompoint->domDocument.createTextNode("1");
+            startCiText = projectdompoint->domDocument.createTextNode("1");
+          }else {
+              startKaiText = projectdompoint->domDocument.createTextNode(field("otherKaiNum").toString());
+              startCiText = projectdompoint->domDocument.createTextNode(field("otherCiNum").toString());
+          }
+
           hasfinishfisrt.appendChild(hasfinishfisrtText);
-          StatusKai.appendChild(KaiText);
-          StatusCi.appendChild(CiText);
+          startKai.appendChild(startKaiText);
+          startCi.appendChild(startCiText);
+          currentKai.appendChild(currentKaiText);
+          currentCi.appendChild(currentCiText);
+
           SpecificInfo.appendChild(hasfinishfisrt);
-          SpecificInfo.appendChild(StatusKai);
-          SpecificInfo.appendChild(StatusCi);
+          SpecificInfo.appendChild(currentKai);
+          SpecificInfo.appendChild(currentCi);
+          SpecificInfo.appendChild(startKai);
+          SpecificInfo.appendChild(startCi);
 
     } else {
         QDomElement taoguanmcxs = projectdompoint->domDocument.createElement("taoguanmcxs");
@@ -343,8 +359,6 @@ void CreateProWizard::accept()
     QString proname = field("FproName").toString();
     bool    projectisreal = field("FproRealtime").toBool();
     QString  folder = prodir+"/"+proname;
-    QString Sstep = field("FProjectStep").toString();
-    double Dstep = Sstep.toDouble();
 
     QDir dir;
     if(!dir.exists(folder))

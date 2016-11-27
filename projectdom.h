@@ -16,6 +16,8 @@ struct TableInf{
     QString         tableName;
     QStringList     tableRowHeadTag;
     QStringList     tableConstData[5];
+    QVector <QStringList> fileData;
+
     int             tableColNum;
     int             tableRowNum;
 };
@@ -23,6 +25,20 @@ struct TableInf{
 struct KaiCiNum{
     int     kainum;
     int     cinum;
+};
+
+struct LineData{
+    QString     kaiLineD0;
+    QString     kaiLineD1;
+    QString     kaiLineD2;
+    QString     kaiLineD3;
+    QString     kaiLineD4;
+    QString     kaiLineD5;
+    QString     kaiLineD6;
+
+    QString     ciLineD0;
+    QString     ciLineD1;
+    QString     ciLineD2;
 };
 
 class ProjectDom
@@ -46,6 +62,8 @@ public:
 
     KaiCiNum    showKaiCiNum();
     void        setKaiCiNum(KaiCiNum kaicinum);
+    KaiCiNum    showStartKaiCiNum();
+    void        setStartKaiCiNum(KaiCiNum kaicinum);
     bool        showHasFinishFirst();
     void        setHasFinishFirst();
 
@@ -59,8 +77,11 @@ public:
     bool        showNotSaveFlag();
 
     ExcelFile * efilep[4];
-    CsvFile   * cfilep[2];
+    CsvFile   * cfilep[3];
     TableInf    tableinf[2];
+    KaiCiNum    tmpKaiCiNum;
+    LineData    tmpLineData;
+
 private:
     bool    flagNeedToSave;
 };

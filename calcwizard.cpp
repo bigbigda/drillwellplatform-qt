@@ -28,11 +28,9 @@ SetStepPage::SetStepPage(ProjectDom *tmpprodompoint, QWidget *parent)
     QGridLayout *layout3 = new QGridLayout;
 
     QVBoxLayout *layout = new QVBoxLayout;
-//    layout->addWidget(label,0,0);
 
     pronameLabel = new QLabel(QString::fromLocal8Bit("&项目名称 :"));
     pronameLabel2 = new QLabel;
- //   pronameLabel2->setText(QString::fromLocal8Bit("name_for_debug"));
     pronameLabel2->setText(projectdompoint->projectName);
     pronameLabel->setBuddy(pronameLabel2);
     procatLabel = new QLabel(QString::fromLocal8Bit("&项目类型 :"));
@@ -89,7 +87,7 @@ NiuFPage::NiuFPage(ProjectDom * tmpprodompoint, QWizard *parent)
    // calcbutton->sizePolicy();
 
     QVBoxLayout *layout = new QVBoxLayout;
-  //  layout->addWidget(fricforcButton,2);
+    layout->addWidget(fricforcButton,2);
     layout->addWidget(torquecalcButton,2);
     layout->addWidget(calcbutton,2);
     setLayout(layout);
@@ -213,53 +211,71 @@ ShowAndEditDialog::ShowAndEditDialog(ProjectDom * tmpprodompoint, QWidget *paren
     // int frameStyle = QFrame::Sunken | QFrame::Panel;
      int frameStyle =  QFrame::Panel;
 
-     taoguanLabel = new QLabel;
-     taoguanLabel->setFrameStyle(frameStyle);
-     QPushButton *integerButton =
-             new QPushButton(QString::fromLocal8Bit("套管段摩擦系数"));
-     taoguanLabel->setText(QString::number(123.123));
+//     taoguanLabel = new QLabel;
+//     taoguanLabel->setFrameStyle(frameStyle);
+//     QPushButton *integerButton =
+//             new QPushButton(QString::fromLocal8Bit("套管段摩擦系数"));
+//     taoguanLabel->setText(QString::number(123.123));
 
      luoyanLabel = new QLabel;
      luoyanLabel->setFrameStyle(frameStyle);
      QPushButton *doubleButton =
              new QPushButton(QString::fromLocal8Bit("裸眼段摩擦系数"));
-     luoyanLabel->setText(QString::number(456.456));
+     if(this->projectdompoint->projectIsrealtime == false){
+        luoyanLabel->setText(this->projectdompoint->showLuomo());
+     }else {
+         luoyanLabel->setText(this->projectdompoint->tmpLineData.ciLineD2);
+     }
 
-     connect(integerButton, &QAbstractButton::clicked, this, &ShowAndEditDialog::setTaoguan);
+//     connect(integerButton, &QAbstractButton::clicked, this, &ShowAndEditDialog::setTaoguan);
      connect(doubleButton, &QAbstractButton::clicked, this, &ShowAndEditDialog::setLuoyan);
 
-     QGridLayout *layout = new QGridLayout;
+     QHBoxLayout *layout = new QHBoxLayout;
 
     // layout->setColumnStretch(10, 20);
-     layout->setColumnMinimumWidth(1, 250);
-     layout->addWidget(integerButton, 0, 0);
-     layout->addWidget(taoguanLabel, 0, 1);
+//     layout->setColumnMinimumWidth(1, 250);
+    luoyanLabel->setMinimumHeight(40);
+    luoyanLabel->setMinimumWidth(200);
+//     layout->addWidget(integerButton, 0, 0);
+//     layout->addWidget(taoguanLabel, 0, 1);
 
-     layout->addWidget(doubleButton, 1, 0);
-     layout->addWidget(luoyanLabel, 1, 1);
-     layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Ignored, QSizePolicy::MinimumExpanding), 5, 0);
+     layout->addWidget(doubleButton);
+     layout->addWidget(luoyanLabel,3);
+//     layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Ignored, QSizePolicy::MinimumExpanding), 5, 0);
 
      setLayout(layout);
 }
 void ShowAndEditDialog::setTaoguan()
 {
-//! [0]
     bool ok;
     double d1 = QInputDialog::getDouble(this,QString::fromLocal8Bit("修改"),
                                  QString::fromLocal8Bit("套管段摩擦系数:                    "),123.123, -214783647, 214783647, 5, &ok);
     if (ok)
         taoguanLabel->setText(QString::number(d1));
-//! [0]
 }
 void ShowAndEditDialog::setLuoyan()
 {
-//! [1]
     bool ok;
-
+    double luom;
+    QString luomString;
+    if(this->projectdompoint->projectIsrealtime == false){
+        luom= this->projectdompoint->showLuomo().toDouble();
+    } else {
+        luom=this->projectdompoint->tmpLineData.ciLineD2.toDouble();
+    }
     double d2 = QInputDialog::getDouble(this, QString::fromLocal8Bit("修改"),
-                                       QString::fromLocal8Bit("裸眼段摩擦系数:                    "),456.456, -214783647, 214783647, 5, &ok);
-    if (ok)
-        luoyanLabel->setText(QString::number(d2));
-//! [1]
+                                       QString::fromLocal8Bit("裸眼段摩擦系数:                    "),luom, -214783647, 214783647, 5, &ok);
+    if (ok){
+        if(this->projectdompoint->projectIsrealtime == false){
+            luomString = QString("%1").arg(d2,0,'f',5);
+            this->projectdompoint->setLuomo(luomString);
+        }else {
+            luomString = QString("%1").arg(d2,0,'f',5);
+            this->projectdompoint->tmpLineData.ciLineD2 = luomString;
+        }
+
+        luoyanLabel->setText(luomString);
+    }
+
 }
 

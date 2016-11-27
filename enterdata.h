@@ -16,6 +16,24 @@
 #include <QGroupBox>
 #include <projectdom.h>
 
+class tableVLayout : public QVBoxLayout
+{
+    Q_OBJECT
+public:
+    tableVLayout(ProjectDom *tmpdompoint, int type);
+
+    QTableWidget *  inTableWidget;
+    ProjectDom   *  projectdompoint;
+    QComboBox    *  comboxArray[5];
+    int             tabletype;
+
+private slots:
+    void addRowSlot();
+    void searchSlot();
+    void addSearchItemSlot();
+    void removeRowSlot();
+};
+
 class EnterData : public QDialog
 {
     Q_OBJECT
@@ -23,6 +41,12 @@ public:
     EnterData(ProjectDom * tmpdompoint ,QWidget *parent = 0);
     void browse();
     void addLineData();
+    void submit();
+    bool readExcel();
+    bool readAndCheckTable();
+
+    tableVLayout * zuanjuzuheTable;
+    tableVLayout * taoguanTable;
 
     QGridLayout *   KaiLayout;
     QGridLayout *   CiLayout;
@@ -51,21 +75,5 @@ private slots:
 
 
 
-class tableVLayout : public QVBoxLayout
-{
-    Q_OBJECT
-public:
-    tableVLayout(ProjectDom *tmpdompoint, int type);
 
-    QTableWidget *  inTableWidget;
-    ProjectDom   *  projectdompoint;
-    QComboBox    *  comboxArray[5];
-    int             tabletype;
-
-private slots:
-    void addRowSlot();
-    void searchSlot();
-    void addSearchItemSlot();
-    void removeRowSlot();
-};
 #endif // ENTERDATA_H

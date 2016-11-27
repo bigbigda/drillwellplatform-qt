@@ -43,7 +43,7 @@ void ProjectDom::InitTableStruct()
     tableinf[1].tableConstData[1] << "G" << "S";
 //    tableinf[1].tableConstData[2] << "60.325";
 //    tableinf[1].tableConstData[3] << "73.025";
-    tableinf[1].tableConstData[4] << "NC26" << "NC31" <<"NC40" <<"NC46" << "NC50" << "5 1/2FH" << "6 5/8FH";
+    tableinf[1].tableConstData[4] << "NC26" <<"NC31"<< "NC38" <<"NC40" <<"NC46" << "NC50" << "5 1/2FH" << "6 5/8FH";
 }
 void ProjectDom::projectChanged()
 {
@@ -78,8 +78,8 @@ void    ProjectDom::InitWriteXml()
 int ProjectDom::showKaiInfo()
 {
     QDomElement DPProjectElement = domDocument.firstChildElement();
-    QDomElement StatusInfoElement = DPProjectElement.firstChildElement("StatusInfo");
-    QDomElement KaiNoElement = StatusInfoElement.firstChildElement("KaiNo");
+    QDomElement StatusInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+    QDomElement KaiNoElement = StatusInfoElement.firstChildElement("CurrentkaiNo");
     int kai = KaiNoElement.text().toDouble();
     return kai;
 }
@@ -87,8 +87,8 @@ int ProjectDom::showKaiInfo()
 int ProjectDom::showCiInfo()
 {
     QDomElement DPProjectElement = domDocument.firstChildElement();
-    QDomElement StatusInfoElement = DPProjectElement.firstChildElement("StatusInfo");
-    QDomElement CiNoElement = StatusInfoElement.firstChildElement("CiNo");
+    QDomElement StatusInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+    QDomElement CiNoElement = StatusInfoElement.firstChildElement("CurrentCiNo");
     int ci = CiNoElement.text().toDouble();
     return ci;
 }
@@ -154,10 +154,46 @@ void ProjectDom::setKaiCiNum(KaiCiNum kaicinum)
     QDomElement CiNoElement = SpecificInfoElement.firstChildElement("CurrentCiNo");
     QDomText KaiNotext = KaiNoElement.firstChild().toText();
     QDomText CiNotext = CiNoElement.firstChild().toText();
-    KaiNotext.setData(QString(kaicinum.kainum));
-    CiNotext.setData(QString(kaicinum.cinum));
+    KaiNotext.setData(QString::number(kaicinum.kainum));
+    CiNotext.setData(QString::number(kaicinum.cinum));
     }
 }
+
+KaiCiNum    showStartKaiCiNum();
+void        setStartKaiCiNum(KaiCiNum kaicinum);
+
+KaiCiNum ProjectDom::showStartKaiCiNum(){
+    KaiCiNum KaiCiValue;
+    if (this->projectIsrealtime){
+    QDomElement DPProjectElement = domDocument.firstChildElement();
+    QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+    QDomElement KaiNoElement = SpecificInfoElement.firstChildElement("StartkaiNo");
+    QDomElement CiNoElement = SpecificInfoElement.firstChildElement("StartCiNo");
+
+    KaiCiValue.kainum = KaiNoElement.text().toInt();
+    KaiCiValue.cinum = CiNoElement.text().toInt();
+    return KaiCiValue;
+    } else {
+        KaiCiValue.kainum=0;
+        KaiCiValue.cinum=0;
+        return KaiCiValue;
+    }
+}
+
+void ProjectDom::setStartKaiCiNum(KaiCiNum kaicinum)
+{
+    if (this->projectIsrealtime){
+    QDomElement DPProjectElement = domDocument.firstChildElement();
+    QDomElement SpecificInfoElement = DPProjectElement.firstChildElement("SpecificInfo");
+    QDomElement KaiNoElement = SpecificInfoElement.firstChildElement("StartkaiNo");
+    QDomElement CiNoElement = SpecificInfoElement.firstChildElement("StartCiNo");
+    QDomText KaiNotext = KaiNoElement.firstChild().toText();
+    QDomText CiNotext = CiNoElement.firstChild().toText();
+    KaiNotext.setData(QString::number(kaicinum.kainum));
+    CiNotext.setData(QString::number(kaicinum.cinum));
+    }
+}
+
 bool ProjectDom::showHasFinishFirst()
 {
     if (this->projectIsrealtime){

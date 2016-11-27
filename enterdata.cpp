@@ -10,37 +10,108 @@ void tableVLayout::addSearchItemSlot(){
 
     QComboBox *tempCom;
     QString searchItem[5];
-    for(int i=0;i<5;i++){
-        tempCom = (QComboBox *)(this->inTableWidget->cellWidget(0,i));
-        searchItem[i] = tempCom->currentText();
-        inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(searchItem[i]));
+    if(((QComboBox *)(inTableWidget->cellWidget(0,0)))->currentText() == QString::fromLocal8Bit("钻杆")){
+        for(int i=0;i<5;i++){
+            tempCom = (QComboBox *)(this->inTableWidget->cellWidget(0,i));
+            searchItem[i] = tempCom->currentText();
+            inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(searchItem[i]));
+        }
+
+        for(int i=5;i<projectdompoint->tableinf[1].tableColNum;i++){
+            inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(inTableWidget->item(0,i)->text()));
+        }
+    } else {
+        for(int i=0;i<1;i++){
+            tempCom = (QComboBox *)(this->inTableWidget->cellWidget(0,i));
+            searchItem[i] = tempCom->currentText();
+            inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(searchItem[i]));
+        }
+        for(int i=1;i<2;i++){
+            inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(""));
+            inTableWidget->item(projectdompoint->tableinf[1].tableRowNum-1,i)->setFlags(Qt::ItemIsEditable);
+            inTableWidget->item(projectdompoint->tableinf[1].tableRowNum-1,i)->setBackgroundColor(QColor(Qt::lightGray));
+        }
+        for(int i=2;i<4;i++){
+            tempCom = (QComboBox *)(this->inTableWidget->cellWidget(0,i));
+            searchItem[i] = tempCom->currentText();
+            inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(searchItem[i]));
+        }
+        for(int i=4;i<7;i++){
+            inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(""));
+            inTableWidget->item(projectdompoint->tableinf[1].tableRowNum-1,i)->setFlags(Qt::ItemIsEditable);
+            inTableWidget->item(projectdompoint->tableinf[1].tableRowNum-1,i)->setBackgroundColor(QColor(Qt::lightGray));
+        }
+        for(int i=7;i<projectdompoint->tableinf[1].tableColNum;i++){
+            inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(inTableWidget->item(0,i)->text()));
+        }
     }
 
-    for(int i=5;i<projectdompoint->tableinf[1].tableColNum;i++){
-        inTableWidget->setItem(projectdompoint->tableinf[1].tableRowNum-1,i,new QTableWidgetItem(inTableWidget->item(0,i)->text()));
-    }
 }
 
 void tableVLayout::searchSlot(){
     int ncount = 0;
     int nresult = -1;
     for (int i = 0; i < projectdompoint->cfilep[0]->actRowNum; i++){
-        if((QComboBox *)(inTableWidget->cellWidget(0,0))->currentText() == "钻杆" && projectdompoint->cfilep[0]->fileData[0]=="A" ){
-            for (int j0 = 1; j < 5; j++){
-                if((QComboBox *)(inTableWidget->cellWidget(0,j0))->currentText() != projectdompoint->cfilep[0]->fileData[j0]){
+        if(((QComboBox *)(inTableWidget->cellWidget(0,0)))->currentText() == QString::fromLocal8Bit("钻杆") && projectdompoint->cfilep[0]->fileData[i].at(0)=="A" ){
+            int compareColumCount = 0;
+            for (int j0 = 1; j0 < 5; j0++){
+                if(((QComboBox *)(inTableWidget->cellWidget(0,j0)))->currentText() != projectdompoint->cfilep[0]->fileData[i].at(j0)){
                     break;
                 }
-                ncount ++;
-                nresult = j0;
+                compareColumCount++;
             }
-
-        }else if(inTableWidget->cellWidget(0,0))->currentText() == "加重钻杆" && projectdompoint->cfilep[0]->fileData[0] == "B"{
-
-    } else if(inTableWidget->cellWidget(0,0))->currentText() == "钻铤" && projectdompoint->cfilep[0]->fileData[0] == "C"){
-        ;
+            if(compareColumCount == 4){
+               ncount ++;
+               nresult = i;
+            }
+        } else if(((QComboBox *)(inTableWidget->cellWidget(0,0)))->currentText() == QString::fromLocal8Bit("加重钻杆") && projectdompoint->cfilep[0]->fileData[i].at(0) == "B"){
+            int compareColumCount = 0;
+            for (int j1 = 2; j1 < 4; j1++){
+                if(((QComboBox *)(inTableWidget->cellWidget(0,j1)))->currentText() != projectdompoint->cfilep[0]->fileData[i].at(j1)){
+                    break;
+                }
+                compareColumCount++;
+            }
+            if(compareColumCount == 2){
+               ncount ++;
+               nresult = i;
+            }
+        } else if(((QComboBox *)(inTableWidget->cellWidget(0,0)))->currentText() == QString::fromLocal8Bit("钻铤") && projectdompoint->cfilep[0]->fileData[i].at(0) == "C" ){
+            int compareColumCount = 0;
+            for (int j2 = 2; j2 < 4; j2++){
+                if(((QComboBox *)(inTableWidget->cellWidget(0,j2)))->currentText() != projectdompoint->cfilep[0]->fileData[i].at(j2)){
+                    qDebug()<<"===========================分割线";
+                    qDebug()<<((QComboBox *)inTableWidget->cellWidget(0,j2))->currentText();
+                    qDebug()<<projectdompoint->cfilep[0]->fileData[i].at(j2);
+                    qDebug()<<"===========================分割线";
+                    break;
+                }
+                compareColumCount ++;
+            }
+            if(compareColumCount == 2){
+               ncount ++;
+               nresult = i;
+            }
+        }
+    }
+    if(nresult == -1){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(QString::fromLocal8Bit("警告"));
+        msgBox.setText(QString::fromLocal8Bit("未找到此钻具"));
+        msgBox.exec();
+    }else{
+        if(ncount > 1){
+            QMessageBox msgBox;
+            msgBox.setWindowTitle(QString::fromLocal8Bit("警告"));
+            msgBox.setText(QString::fromLocal8Bit("找到多项"));
+            msgBox.exec();
+        }
+        for (int k = 5; k < 8; k ++){
+            inTableWidget->setItem(0, k, new QTableWidgetItem(projectdompoint->cfilep[0]->fileData[nresult].at(k)));
+        }
+            inTableWidget->setItem(0, 8, new QTableWidgetItem("1"));
     }
 }
-
 void tableVLayout::removeRowSlot()
 {
     if(tabletype == 0){
@@ -151,8 +222,7 @@ EnterData::EnterData(ProjectDom *tmpdompoint, QWidget *parent): QDialog(parent)
         timeInfoLabel->setText(QString::fromLocal8Bit("估算模式"));
         timeInfoLabel->setFont((QFont("Times", 18 , QFont::Bold) ));
         timeInfoLabel->setMaximumHeight(50);
-    //}else if(projectdompoint->showHasFinishFirst() == false){
-    }else if(0){
+    }else if(projectdompoint->showHasFinishFirst() == false){
         KaiCiNum kaici = projectdompoint->showKaiCiNum();
         timeInfoLabel->setText(QString::fromLocal8Bit("第")+ QString::number(kaici.kainum)+QString::fromLocal8Bit("开第")
                                +QString::number(kaici.cinum)+QString::fromLocal8Bit("次"));
@@ -199,14 +269,14 @@ EnterData::EnterData(ProjectDom *tmpdompoint, QWidget *parent): QDialog(parent)
         connect(confirmNewButton,SIGNAL(pressed()),this,SLOT(selKaiCi()));
     }
 
-    QVBoxLayout * taoguanTable = 0;
+    taoguanTable = 0;
     if(projectdompoint->projectIsrealtime){
         addLineData();
     }else{
         taoguanTable = new tableVLayout(tmpdompoint, 0);
     }
 
-    QVBoxLayout * zuanjuzuheTable =   new tableVLayout(tmpdompoint, 1);
+    zuanjuzuheTable =   new tableVLayout(tmpdompoint, 1);
 
     QHBoxLayout * readzjDbLayout = new QHBoxLayout;
     QLabel * readzjDbLabel = new QLabel(QString::fromLocal8Bit("钻具详表:"));
@@ -227,12 +297,13 @@ EnterData::EnterData(ProjectDom *tmpdompoint, QWidget *parent): QDialog(parent)
     submitButton->setFont(QFont("Times", 12));
     submitButton->setMaximumHeight(65);
     submitButton->setMinimumHeight(55);
+    connect(submitButton, &QAbstractButton::clicked, this, &EnterData::submit);
 
     layout = new QVBoxLayout();
     layout->addWidget(timeInfoLabel,Qt::AlignTop);
     layout->addItem(new QSpacerItem(1,8));
     if(projectdompoint->projectIsrealtime){
-        if(1){
+        if(projectdompoint->showHasFinishFirst()){
             layout->addLayout(selectKaiCiLayout);
             KaiD0Edit->setEnabled(0);
             KaiD1Edit->setEnabled(0);
@@ -245,6 +316,7 @@ EnterData::EnterData(ProjectDom *tmpdompoint, QWidget *parent): QDialog(parent)
             CiD1Edit->setEnabled(0);
             CiD2Edit->setEnabled(0);
         }
+
         layout->addLayout(KaiLayout);
         layout->addLayout(CiLayout);
     }else{
@@ -264,30 +336,211 @@ void EnterData::browse()
     readzjDbLineEdit->setText(filename);
 }
 
+void EnterData::submit(){
+
+    if(readAndCheckTable() == false){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
+        msgBox.setText(QString::fromLocal8Bit("套管表信息不符合规定"));
+        msgBox.exec();
+        projectdompoint->tableinf[0].fileData.clear();
+        projectdompoint->tableinf[1].fileData.clear();
+        return;
+    }
+
+    if(readExcel()==false){
+        projectdompoint->tableinf[0].fileData.clear();
+        projectdompoint->tableinf[1].fileData.clear();
+        return;
+    }
+
+    qDebug()<<"@@@@@@"<<projectdompoint->efilep[3]->rowNum;
+    qDebug()<<"@@@@@@"<<zuanjuzuheTable->inTableWidget->rowCount();
+
+    int zuanjuNum = 0;
+    for (int zuanjuTableRowCount = 1; zuanjuTableRowCount < zuanjuzuheTable->inTableWidget->rowCount(); zuanjuTableRowCount++){
+        zuanjuNum +=  projectdompoint->tableinf[1].fileData[zuanjuTableRowCount-1].at(8).toInt();
+    }
+    qDebug()<<"&&&&"<<zuanjuNum;
+
+    if((projectdompoint->efilep[3]->rowNum) != (zuanjuNum+ 1)){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
+        msgBox.setText(QString::fromLocal8Bit("钻具详表与钻具性能数据行数不匹配"));
+        msgBox.exec();
+        projectdompoint->tableinf[0].fileData.clear();
+        projectdompoint->tableinf[1].fileData.clear();
+        return;
+    }
+
+    if(projectdompoint->projectIsrealtime){
+        this->projectdompoint->tmpLineData.kaiLineD0 =  KaiD0Edit->text();
+        this->projectdompoint->tmpLineData.kaiLineD1 =  KaiD1Edit->text();
+        this->projectdompoint->tmpLineData.kaiLineD2 =  KaiD2Edit->text();
+        this->projectdompoint->tmpLineData.kaiLineD3 =  KaiD3Edit->text();
+        this->projectdompoint->tmpLineData.kaiLineD4 =  KaiD4Edit->text();
+        this->projectdompoint->tmpLineData.kaiLineD5 =  KaiD5Edit->text();
+        this->projectdompoint->tmpLineData.kaiLineD6 =  KaiD6Edit->text();
+
+        this->projectdompoint->tmpLineData.ciLineD0 =  CiD0Edit->text();
+        this->projectdompoint->tmpLineData.ciLineD1 =  CiD1Edit->text();
+        this->projectdompoint->tmpLineData.ciLineD2 =  CiD2Edit->text();
+    }
+    accept();
+}
+
+bool EnterData::readAndCheckTable(){
+
+    //if(taoguanTable->inTableWidget->
+
+//    qDebug()<<"rowNum:"<<taoguanTable->inTableWidget->rowCount();
+//    qDebug()<<"colNum:"<<taoguanTable->inTableWidget->columnCount();
+
+    if(projectdompoint->projectIsrealtime == false){
+        for(int rowNum = 0; rowNum < taoguanTable->inTableWidget->rowCount(); rowNum ++){
+            this->projectdompoint->tableinf[0].fileData.append(QStringList());
+            for (int colNum = 0; colNum < taoguanTable->inTableWidget->columnCount(); colNum ++){
+                if(taoguanTable->inTableWidget->item(rowNum,colNum)!=0){
+                    this->projectdompoint->tableinf[0].fileData[this->projectdompoint->tableinf[0].fileData.count()-1]
+                        .append(taoguanTable->inTableWidget->item(rowNum,colNum)->text());
+                }else{
+                    this->projectdompoint->tableinf[0].fileData[this->projectdompoint->tableinf[0].fileData.count()-1]
+                        .append("");
+                }
+            }
+        }
+
+        int tmpkaiNumCount = 0;
+        double tmpWellBottomDepth = 0;   //bottom in col 3
+        for(int rowNum = 0; rowNum < this->projectdompoint->tableinf[0].fileData.count(); rowNum ++){
+            qDebug() <<"^^"<< QString::number(tmpWellBottomDepth);
+            if((tmpWellBottomDepth != 0 && this->projectdompoint->tableinf[0].fileData[rowNum].at(0).toInt() < tmpkaiNumCount) ||
+                this->projectdompoint->tableinf[0].fileData[rowNum].at(0).toInt() == 0 ||
+                this->projectdompoint->tableinf[0].fileData[rowNum].at(2).toDouble() < 0 ||
+                (this->projectdompoint->tableinf[0].fileData[rowNum].at(3).toDouble() <=
+                this->projectdompoint->tableinf[0].fileData[rowNum].at(2).toDouble()) ){
+                qDebug()<<(this->projectdompoint->tableinf[0].fileData[rowNum].at(0).toInt() == 0 );
+                qDebug()<<(this->projectdompoint->tableinf[0].fileData[rowNum].at(2).toDouble() < 0 );
+                qDebug()<<(this->projectdompoint->tableinf[0].fileData[rowNum].at(3).toDouble() <=
+                           this->projectdompoint->tableinf[0].fileData[rowNum].at(2).toDouble()) ;
+                qDebug()<<(this->projectdompoint->tableinf[0].fileData[rowNum].at(0).toInt() < tmpWellBottomDepth);
+
+                qDebug()<<"%%%";
+
+                return false;
+            }else{
+                if(tmpkaiNumCount == 0){
+                    tmpkaiNumCount = this->projectdompoint->tableinf[0].fileData[rowNum].at(0).toInt();
+                    tmpWellBottomDepth = this->projectdompoint->tableinf[0].fileData[rowNum].at(3).toDouble();
+                } else if(tmpkaiNumCount == this->projectdompoint->tableinf[0].fileData[rowNum].at(0).toInt()){
+                    if(this->projectdompoint->tableinf[0].fileData[rowNum].at(2).toDouble() > tmpWellBottomDepth){
+                        return false;
+                    } else{
+                        tmpWellBottomDepth = this->projectdompoint->tableinf[0].fileData[rowNum].at(3).toDouble();
+                    }
+                } else {
+                    if ((tmpkaiNumCount+1) != this->projectdompoint->tableinf[0].fileData[rowNum].at(0).toInt()){
+                        return false;
+                    } else if(this->projectdompoint->tableinf[0].fileData[rowNum].at(2).toDouble() != tmpWellBottomDepth){
+                        return false;
+                    } else{
+                        tmpWellBottomDepth = this->projectdompoint->tableinf[0].fileData[rowNum].at(3).toDouble();
+                        tmpkaiNumCount = this->projectdompoint->tableinf[0].fileData[rowNum].at(0).toInt();
+                    }
+                }
+            }
+         }
+    }
+    for(int rowNum = 1; rowNum < zuanjuzuheTable->inTableWidget->rowCount(); rowNum ++){
+        this->projectdompoint->tableinf[1].fileData.append(QStringList());
+        for (int colNum = 0; colNum < zuanjuzuheTable->inTableWidget->columnCount(); colNum ++){
+            if(zuanjuzuheTable->inTableWidget->item(rowNum,colNum)!=0){
+                this->projectdompoint->tableinf[1].fileData[this->projectdompoint->tableinf[1].fileData.count()-1]
+                    .append(zuanjuzuheTable->inTableWidget->item(rowNum,colNum)->text());
+            }else{
+                this->projectdompoint->tableinf[1].fileData[this->projectdompoint->tableinf[1].fileData.count()-1]
+                    .append("");
+            }
+        }
+    }
+    return true;
+}
+
+bool EnterData::readExcel(){
+    QFileInfo fread4info(readzjDbLineEdit->text());
+
+    if(!fread4info.exists() || !fread4info.isFile()){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
+        msgBox.setText(QString::fromLocal8Bit("钻具详表路径设置错误      "));
+        msgBox.exec();
+        return false;
+    }
+    projectdompoint->efilep[3] = new ExcelFile((fread4info.absoluteFilePath()),
+                                              QString::fromLocal8Bit("钻具详表"),3,4,1,0);
+    QAxObject*  excel = new QAxObject( "Excel.Application", 0 );
+    QAxObject*  workbooks = excel->querySubObject("WorkBooks");
+    if (!projectdompoint->efilep[3]->readExcel(workbooks))
+    {
+        excel->dynamicCall("Quit(void)");
+        delete excel;
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
+        msgBox.setText(QString::fromLocal8Bit("数据读取错误      "));
+        msgBox.exec();
+        return false;
+    }
+    excel->dynamicCall("Quit(void)");
+    delete excel;
+    return true;
+
+}
+
+
 void EnterData::selKaiCi()
 {
     KaiCiNum kaici = projectdompoint->showKaiCiNum();
+
+
     if(newKaiButton->isChecked()){
-        timeInfoLabel->setText(QString::fromLocal8Bit("第")+ QString::number(kaici.kainum + 1)+QString::fromLocal8Bit("开第")
-                               +QString::number(1)+QString::fromLocal8Bit("次"));
+        projectdompoint->tmpKaiCiNum.kainum = kaici.kainum + 1;
+        projectdompoint->tmpKaiCiNum.cinum = 1;
     }else{
-        timeInfoLabel->setText(QString::fromLocal8Bit("第")+ QString::number(kaici.kainum)+QString::fromLocal8Bit("开第")
-                               +QString::number(kaici.cinum+1)+QString::fromLocal8Bit("次"));
+        projectdompoint->tmpKaiCiNum.kainum = kaici.kainum;
+        projectdompoint->tmpKaiCiNum.cinum = kaici.cinum + 1;
     }
+    timeInfoLabel->setText(QString::fromLocal8Bit("第")+ QString::number(projectdompoint->tmpKaiCiNum.kainum)+QString::fromLocal8Bit("开第")
+                           +QString::number(projectdompoint->tmpKaiCiNum.cinum)+QString::fromLocal8Bit("次"));
     newKaiButton->setEnabled(0);
     newCiButton->setEnabled(0);
     confirmNewButton->setEnabled(0);
-    KaiD0Edit->setEnabled(1);
-    KaiD1Edit->setEnabled(1);
-    KaiD2Edit->setEnabled(1);
-    KaiD3Edit->setEnabled(1);
-    KaiD4Edit->setEnabled(1);
-    KaiD5Edit->setEnabled(1);
-    KaiD6Edit->setEnabled(1);
+
     CiD0Edit->setEnabled(1);
     CiD1Edit->setEnabled(1);
     CiD2Edit->setEnabled(1);
+
+    if(projectdompoint->tmpKaiCiNum.cinum == 1){
+        KaiD0Edit->setEnabled(1);
+        KaiD1Edit->setEnabled(1);
+        KaiD2Edit->setEnabled(1);
+        KaiD3Edit->setEnabled(1);
+        KaiD4Edit->setEnabled(1);
+        KaiD5Edit->setEnabled(1);
+        KaiD6Edit->setEnabled(1);
+    } else {
+        //qDebug()<<
+        KaiD0Edit->setText(this->projectdompoint->cfilep[2]->fileData.last().at(0));
+        KaiD1Edit->setText(this->projectdompoint->cfilep[2]->fileData.last().at(1));
+        KaiD2Edit->setText(this->projectdompoint->cfilep[2]->fileData.last().at(2));
+        KaiD3Edit->setText(this->projectdompoint->cfilep[2]->fileData.last().at(3));
+        KaiD4Edit->setText(this->projectdompoint->cfilep[2]->fileData.last().at(4));
+        KaiD5Edit->setText(this->projectdompoint->cfilep[2]->fileData.last().at(5));
+        KaiD6Edit->setText(this->projectdompoint->cfilep[2]->fileData.last().at(6));
+    }
+
 }
+
+
 
 void EnterData::addLineData(){
     KaiLayout = new QGridLayout();

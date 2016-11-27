@@ -134,6 +134,9 @@
    <property name="text">
     <string>显示</string>
    </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
   </action>
   <action name="action_Save">
    <property name="text">
@@ -141,6 +144,9 @@
    </property>
    <property name="toolTip">
     <string>保存计算结果</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="action_set">

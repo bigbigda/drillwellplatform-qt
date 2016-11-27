@@ -123,7 +123,7 @@ bool ReadBasicExcel::readandcheckfile(QFileInfo fread1info,QFileInfo fread2info,
     int wellTrackCol;
     int drillFluitCol;
     int drillProjectCol;
-    qInfo(fread1info.absoluteFilePath().toLatin1());
+    qDebug()<<fread1info.absoluteFilePath();
     wellTrackHHeader<<QString::fromLocal8Bit("测深L")<<QString::fromLocal8Bit("井斜角a")<<QString::fromLocal8Bit("方位角");
     wellTrackCol = 3;
     if(projectdompoint->projectIsrealtime){
@@ -139,13 +139,12 @@ bool ReadBasicExcel::readandcheckfile(QFileInfo fread1info,QFileInfo fread2info,
         drillFluitCol = 3;
         drillProjectCol = 9;
     }
-    QStringList nullStringList;
-
-    projectdompoint->efilep[0] = new ExcelFile(fread1info.absoluteFilePath().toLatin1(),
+// .toUtf8()
+    projectdompoint->efilep[0] = new ExcelFile((fread1info.absoluteFilePath()),
                                               QString::fromLocal8Bit("井眼轨迹数据"),0,3,1,0);
-    projectdompoint->efilep[1] = new ExcelFile(fread1info.absoluteFilePath().toLatin1(),
+    projectdompoint->efilep[1] = new ExcelFile((fread2info.absoluteFilePath()),
                                               QString::fromLocal8Bit("钻井液数据"),0,4,1,0);
-    projectdompoint->efilep[2] = new ExcelFile(fread3info.absoluteFilePath().toLatin1(),
+    projectdompoint->efilep[2] = new ExcelFile((fread3info.absoluteFilePath()),
                                               QString::fromLocal8Bit("钻井工程参数"),0,3,1,0);
 
     //read excel
@@ -164,7 +163,6 @@ bool ReadBasicExcel::readandcheckfile(QFileInfo fread1info,QFileInfo fread2info,
     }
     excel->dynamicCall("Quit(void)");
     delete excel;
-
     if(!projectdompoint->efilep[0]->checkExcel() || !projectdompoint->efilep[1]->checkExcel() ||
             !projectdompoint->efilep[2]->checkExcel() || !compareDepth())
     {
@@ -174,7 +172,6 @@ bool ReadBasicExcel::readandcheckfile(QFileInfo fread1info,QFileInfo fread2info,
         msgBox.exec();
         return false;
     }
-
     return true;
 }
 

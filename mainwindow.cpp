@@ -15,8 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
 //    setWindowIcon(QIcon(":/new/qt.png"));
     ui->action_set->setEnabled(false);
     ui->action_ReadExcel->setEnabled(false);
-    ui->action_EnterData->setEnabled(1);
-    ui->action_Cal->setEnabled(1);
+    ui->action_EnterData->setEnabled(false);
+    ui->action_Cal->setEnabled(false);
     ui->action_Save->setEnabled(false);
 }
 
@@ -68,11 +68,25 @@ void MainWindow::on_action_New_triggered()
 
     if(createprodialogPoint->exec() == QDialog::Accepted)
     {
+        if(this->projectdompoint->projectIsrealtime){
+            this->projectdompoint->tmpKaiCiNum = this->projectdompoint->showKaiCiNum();
+            if(this->projectdompoint->tmpKaiCiNum.kainum == 0){
+                this->projectdompoint->tmpKaiCiNum.kainum = 1;
+                this->projectdompoint->setKaiCiNum(this->projectdompoint->tmpKaiCiNum);
+                this->projectdompoint->setStartKaiCiNum(this->projectdompoint->tmpKaiCiNum);
+            }
+            if(this->projectdompoint->tmpKaiCiNum.cinum == 0){
+                this->projectdompoint->tmpKaiCiNum.cinum = 1;
+                this->projectdompoint->setKaiCiNum(this->projectdompoint->tmpKaiCiNum);
+                this->projectdompoint->setStartKaiCiNum(this->projectdompoint->tmpKaiCiNum);
+            }
+        }
+
         this->projectdompoint->InitWriteXml();
 
         ui->action_ReadExcel->setEnabled(true);
         ui->action_set->setEnabled(true);
-        ui->action_EnterData->setEnabled(1);
+        ui->action_EnterData->setEnabled(false);
         ui->action_Cal->setEnabled(false);
     }
         delete createprodialogPoint;
@@ -107,12 +121,14 @@ void MainWindow::on_action_Open_triggered()
 
         projectdompoint->projectName = ProjectNameElement.text();
         projectdompoint->projectDir  = QFileInfo(xmlFile).absolutePath();
-
+        if(this->projectdompoint->projectIsrealtime){
+            this->projectdompoint->tmpKaiCiNum = this->projectdompoint->showKaiCiNum();
+        }
         projectdompoint->projectIsrealtime = (ProjectCategory.text() == "RealTime");
 
         ui->action_ReadExcel->setEnabled(true);
         ui->action_set->setEnabled(true);
-        ui->action_EnterData->setEnabled(1);
+        ui->action_EnterData->setEnabled(false);
         ui->action_Cal->setEnabled(false);
     }
 }
@@ -153,6 +169,7 @@ void MainWindow::on_action_ReadExcel_triggered()
     qDebug("!!!!!!!!!!!!!!!!!!!!");
     qDebug((QCoreApplication::applicationDirPath()).toLatin1());
     qDebug(QDir::currentPath().toLatin1());
+
     qDebug("!!!!!!!!!!!!!!!!!!!!");
 
     QString zuanjuDbPath = QCoreApplication::applicationDirPath()+"/zuanjuDb.csv";           //不变的数据库
@@ -174,6 +191,24 @@ void MainWindow::on_action_ReadExcel_triggered()
         return;
     }
 
+    QString logData = QCoreApplication::applicationDirPath()+"/logData.csv";
+    QFile Fout3(logData);
+    qDebug()<<logData<<"&&&";
+    if(projectdompoint->projectIsrealtime){
+        if(!Fout3.exists()){
+            QMessageBox msgBox;
+            msgBox.setWindowTitle(QString::fromLocal8Bit("错误"));
+            msgBox.setText(QString::fromLocal8Bit("开次配置记录文件不存在      "));
+            msgBox.exec();
+            qDebug()<<logData<<"&&&";
+            return;
+        }
+        qDebug()<<logData<<"&&&";
+        projectdompoint->cfilep[2] = new CsvFile(logData);
+    }
+
+    qDebug()<<projectdompoint->showDataBaseFile();
+    qDebug()<<zuanjuDbPath;
     projectdompoint->cfilep[0] = new CsvFile(zuanjuDbPath);
     projectdompoint->cfilep[1] = new CsvFile(projectdompoint->showDataBaseFile());
     ReadBasicExcel * readbasicexcel = new ReadBasicExcel(this->projectdompoint, this);
@@ -188,7 +223,7 @@ void MainWindow::on_action_ReadExcel_triggered()
 
     if (readbasicexcel->exec() == QDialog::Accepted)
     {
-            ui->action_EnterData->setEnabled(1);
+            ui->action_EnterData->setEnabled(true);
     }
         return;
 }
@@ -196,9 +231,69 @@ void MainWindow::on_action_ReadExcel_triggered()
 void MainWindow::on_action_EnterData_triggered()
 {
     EnterData*  enterdata = new EnterData(this->projectdompoint, this);
+qDebug()<<"I am good1";
+    //log data
+    if(projectdompoint->projectIsrealtime){
+//        this->projectdompoint->cfilep[2]->fileData.append(QStringList());
+//        this->projectdompoint->cfilep[2]->fileData.last().append("2.1");
+//        this->projectdompoint->cfilep[2]->fileData.last().append("0.8");
+//        this->projectdompoint->cfilep[2]->fileData.last().append("47.4");
+//        this->projectdompoint->cfilep[2]->fileData.last().append("58.3");
+//        this->projectdompoint->cfilep[2]->fileData.last().append("45.3");
+//        this->projectdompoint->cfilep[2]->fileData.last().append("60.3");
+//        this->projectdompoint->cfilep[2]->fileData.last().append("0.56");
+    }
+
+qDebug()<<"I am good2";
     if (enterdata->exec() != QDialog::Accepted)
     {
-      ui->action_Cal->setEnabled(1);
+      ui->action_Cal->setEnabled(true);
+      ui->action_Save->setEnabled(true);
     }
-        return;
+    this->projectdompoint->tableinf[0].tableRowNum = 0;
+    this->projectdompoint->tableinf[1].tableRowNum = 1;
+    return;
+}
+
+void MainWindow::on_action_Save_triggered()
+{
+    if(this->projectdompoint->projectIsrealtime){
+        this->projectdompoint->setKaiCiNum(this->projectdompoint->tmpKaiCiNum);
+        if(!this->projectdompoint->showHasFinishFirst()){
+
+            this->projectdompoint->setHasFinishFirst();
+
+            this->projectdompoint->cfilep[2]->fileData.append(QStringList());
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD0);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD1);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD2);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD3);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD4);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD5);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD6);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD0);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD1);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD2);
+        } else if(this->projectdompoint->showCiInfo() == 1){
+            this->projectdompoint->cfilep[2]->fileData.append(QStringList());
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD0);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD1);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD2);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD3);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD4);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD5);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.kaiLineD6);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD0);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD1);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD2);
+        } else{
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD0);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD1);
+            this->projectdompoint->cfilep[2]->fileData.last().append(this->projectdompoint->tmpLineData.ciLineD2);
+        }
+    this->projectdompoint->tableinf[1].tableRowNum = 1;
+    }
+
+    ui->action_Cal->setEnabled(false);
+    ui->action_Save->setEnabled(false);
 }
